@@ -236,6 +236,11 @@ body {
   .flex-start {
     @apply flex items-center justify-start;
   }
+
+  .shadow-card {
+    @apply border border-[rgb(233,234,235)];
+    box-shadow: 0 0 1.5rem rgba(205, 204, 204, 0.16);
+  }
 }
 
 img {

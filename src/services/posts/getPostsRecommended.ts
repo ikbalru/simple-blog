@@ -28,10 +28,12 @@ export const getPostsRecommended: QueryFunction<
   const [path, { limit = 10, page = 1 }] = queryKey;
 
   const apiPath = `${path}`;
+  console.log(apiPath);
 
   const axiosRequestConfig: AxiosRequestConfig = {
     params: { limit, page },
   };
+  console.log(axiosRequestConfig);
 
   const response = await api.get(apiPath, axiosRequestConfig);
 

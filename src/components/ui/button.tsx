@@ -21,6 +21,7 @@ const buttonVariants = cva(
         sm: 'h-12 w-51',
         lg: 'h-12 w-88',
         link: 'w-fit',
+        icon: 'h-6 w-6',
       },
     },
     defaultVariants: {

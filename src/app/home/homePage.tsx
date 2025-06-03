@@ -5,9 +5,10 @@ import Image from 'next/image';
 
 import Navbar from '@/components/layout/navbar';
 import PostCard from '@/components/ui/postCard';
+import RegisterForm from '@/components/ui/RegisterForm';
 
-// dummy data
 import { posts, postsLiked } from '@/app/home/dummyData';
+import { useGetUserProfile } from '@/hooks/users/useGetUserProfile';
 
 interface Post {
   author: { name: string };
@@ -21,11 +22,17 @@ interface Post {
 }
 
 const HomePage = () => {
+  return <RegisterForm />;
+};
+
+export default HomePage;
+
+const Age = () => {
   return (
-    <div className='h-1000'>
+    <div className='h-[150vh]'>
       <Navbar />
 
-      <div className='custom-container mt-10 overflow-hidden'>
+      <main className='custom-container mt-10 overflow-hidden'>
         <div className='grid grid-cols-1 lg:grid-cols-[minmax(auto,50.4rem)_auto_18.5rem]'>
           <div className='pr-0 lg:pr-4'>
             <p className='text-xl-bold md:display-sm-bold mb-4 text-neutral-900 md:mb-6'>
@@ -58,17 +65,17 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-      </div>
+      </main>
       {/* <Footer /> */}
     </div>
   );
 };
 
-export default HomePage;
+// export default HomePage;
 
 const PostMostLiked: React.FC<Post> = ({ title, content, likes, comments }) => {
   return (
-    <div className='w-full'>
+    <aside className='w-full'>
       <p className='text-md-bold text-neutral-900'>{title}</p>
       <p className='text-xs-regular md:text-sm-regular mt-1 line-clamp-2 text-neutral-900'>
         {content}
@@ -92,6 +99,6 @@ const PostMostLiked: React.FC<Post> = ({ title, content, likes, comments }) => {
           <p className='text-sm-regular text-neutral-600'>{comments}</p>
         </div>
       </div>
-    </div>
+    </aside>
   );
 };
