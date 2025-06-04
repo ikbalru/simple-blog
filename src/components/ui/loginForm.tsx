@@ -3,7 +3,6 @@ import { AxiosError } from 'axios';
 import { Eye, EyeClosed } from 'lucide-react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
 import { MoonLoader } from 'react-spinners';
 import z from 'zod';
 
@@ -11,6 +10,7 @@ import { useGetUserProfile } from '@/hooks/users/useGetUserProfile';
 import { cn } from '@/lib/utils';
 import { postLogin } from '@/services/auth/login';
 import { login } from '@/store/redux/auth/auth.slice';
+import { useAppDispatch } from '@/store/redux/store';
 
 import { Button } from './button';
 import { Form, FormField, FormItem, FormLabel, FormMessage } from './form';
@@ -30,7 +30,7 @@ const loginFormSchema = z.object({
 });
 
 const LoginForm: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [showPassword, setShowPassword] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [unauthorized, setUnauthorized] = React.useState(false);

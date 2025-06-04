@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
 import { MoonLoader } from 'react-spinners';
 import z from 'zod';
 
@@ -25,6 +24,7 @@ import { useGetUserProfile } from '@/hooks/users/useGetUserProfile';
 import { cn } from '@/lib/utils';
 import { postLogin } from '@/services/auth/login';
 import { login } from '@/store/redux/auth/auth.slice';
+import { useAppDispatch } from '@/store/redux/store';
 
 const loginFormSchema = z.object({
   email: z
@@ -40,7 +40,7 @@ const loginFormSchema = z.object({
 });
 
 const LoginForm: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
   const [showPassword, setShowPassword] = React.useState(false);

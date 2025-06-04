@@ -1,29 +1,40 @@
 'use client';
 
-import { PenLine, Search } from 'lucide-react';
-import { Menu } from 'lucide-react';
+import { Menu, PenLine, Search } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useSelector } from 'react-redux';
 
 import { selectUser } from '@/store/redux/auth/auth.selector';
+import { logout } from '@/store/redux/auth/auth.slice';
+import { selectSearchQuery } from '@/store/redux/search/search.selector';
+import { useAppDispatch } from '@/store/redux/store';
 
 import { Button } from '../ui/button';
-import { Input } from '../ui/input';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
+import SearchBar from '../ui/searchBar';
 import {
   Sheet,
-  SheetTrigger,
   SheetContent,
   SheetHeader,
   SheetTitle,
+  SheetTrigger,
 } from '../ui/sheet';
 
 const Navbar = () => {
   const user = useSelector(selectUser);
 
+  const searchQuery = useSelector(selectSearchQuery);
+
   return (
-    <div className='h-20 w-full border-b border-neutral-300'>
+    <div className='bg-base-white fixed top-0 z-50 h-16 w-full border-b border-neutral-300 md:h-20'>
       <div className='custom-container flex h-full items-center justify-between gap-4'>
         <Image
           src='/images/logo.svg'
@@ -34,10 +45,11 @@ const Navbar = () => {
         />
 
         {/* search bar */}
-        <div className='hidden h-12 w-93.25 items-center gap-2 rounded-xl border border-neutral-300 px-4 py-2.5 lg:flex'>
+        {/* <div className='hidden h-12 w-93.25 items-center gap-2 rounded-xl border border-neutral-300 px-4 py-2.5 lg:flex'>
           <Search className='size-6 cursor-pointer text-neutral-500' />
           <Input placeholder='Search' className='focus:outline-none' />
-        </div>
+        </div> */}
+        <SearchBar value={searchQuery} />
 
         {/* action buttons */}
         <div className='hidden items-center space-x-6 lg:flex'>
@@ -46,15 +58,12 @@ const Navbar = () => {
               <Link href='/login'>Login</Link>
             </Button>
           ) : (
-            <div
-              typeof='button'
-              className='text-primary-300 flex cursor-pointer items-center gap-2'
-            >
+            <button className='text-primary-300 flex cursor-pointer items-center gap-2'>
               <PenLine className='size-6' />
               <p className='text-sm-semibold underline underline-offset-3'>
                 Write Post
               </p>
-            </div>
+            </button>
           )}
 
           {/* Divider */}
@@ -65,10 +74,12 @@ const Navbar = () => {
               <Link href='/register'>Register</Link>
             </Button>
           ) : (
-            <div className='flex items-center gap-3'>
-              <div className='size-8 rounded-full bg-neutral-400'></div>
-              <p className='text-sm-medium text-neutral-900'>John Doe</p>
-            </div>
+            <DropDownMenu>
+              <div className='flex cursor-pointer items-center gap-3 outline-none'>
+                <div className='size-10 rounded-full bg-neutral-400'></div>
+                <p className='text-sm-medium text-neutral-900'>John Doe</p>
+              </div>
+            </DropDownMenu>
           )}
         </div>
 
@@ -109,7 +120,9 @@ const Navbar = () => {
               </Sheet>
             </>
           ) : (
-            <div className='size-8 rounded-full bg-neutral-400'></div>
+            <DropDownMenu>
+              <div className='size-10 cursor-pointer rounded-full bg-neutral-400'></div>
+            </DropDownMenu>
           )}
         </div>
       </div>
@@ -118,3 +131,52 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+const DropDownMenu: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    router.replace('/');
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger>{children}</DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem>
+          <button className='flex cursor-pointer items-center gap-2'>
+            <Image
+              src='/icons/user-icon.svg'
+              alt='user-icon'
+              width={16}
+              height={16}
+              className='md:size-5'
+            />
+            Profile
+          </button>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <button
+            onClick={() => {
+              handleLogout();
+            }}
+            className='flex cursor-pointer items-center gap-2'
+          >
+            <Image
+              src='/icons/log-out-icon.svg'
+              alt='log-out-icon'
+              width={16}
+              height={16}
+              className='md:size-5'
+            />
+            Logout
+          </button>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};

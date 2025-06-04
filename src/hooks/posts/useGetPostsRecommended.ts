@@ -24,7 +24,7 @@ type UseGetPostsRecommendedReturn = {
 };
 
 export const useGetPostsRecommended = ({
-  limit = 10,
+  limit = 5,
   page = 1,
 }: UseGetPostsRecommendedParams = {}): UseGetPostsRecommendedReturn => {
   const queryKeyPostsRecommended: PostsRecommendedQueryKey = [

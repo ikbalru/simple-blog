@@ -1,36 +1,35 @@
-'use client';
-
 import { QueryFunction } from '@tanstack/react-query';
 import { AxiosRequestConfig } from 'axios';
 
 import { api } from '@/lib/api/axios';
 import { Post } from '@/models/post';
 
-export type PostsRecommendedQueryKey = [
+export type SearchPostsQueryKey = [
   string,
   {
+    query: string;
     limit?: number;
     page?: number;
   },
 ];
 
-export type PostsRecommendedResponse = {
+export type SearchPostsResponse = {
   data: Post[];
   total: number;
   page: number;
   lastPage: number;
 };
 
-export const getPostsRecommended: QueryFunction<
-  PostsRecommendedResponse,
-  PostsRecommendedQueryKey
+export const SearchPosts: QueryFunction<
+  SearchPostsResponse,
+  SearchPostsQueryKey
 > = async ({ queryKey }) => {
-  const [path, { limit = 5, page = 1 }] = queryKey;
+  const [path, { query, limit = 5, page = 1 }] = queryKey;
 
   const apiPath = `${path}`;
 
   const axiosRequestConfig: AxiosRequestConfig = {
-    params: { limit, page },
+    params: { query, limit, page },
   };
 
   const response = await api.get(apiPath, axiosRequestConfig);

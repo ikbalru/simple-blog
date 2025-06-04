@@ -6,7 +6,8 @@ import Image from 'next/image';
 import Navbar from '@/components/layout/navbar';
 import PostCard from '@/components/ui/postCard';
 
-import { posts, postsLiked } from '@/app/home/dummyData';
+import { useGetPostsMostLiked } from '@/hooks/posts/useGetPostsMostLiked';
+import { useGetPostsRecommended } from '@/hooks/posts/useGetPostsRecommended';
 
 interface Post {
   author: { name: string };
@@ -20,18 +21,21 @@ interface Post {
 }
 
 const Home = () => {
+  const { postsRecommended } = useGetPostsRecommended();
+  const { postsMostLiked } = useGetPostsMostLiked();
+
   return (
-    <div className='h-[150vh]'>
+    <>
       <Navbar />
 
-      <main className='custom-container mt-10 overflow-hidden'>
+      <main className='custom-container mt-22 overflow-hidden md:mt-32'>
         <div className='grid grid-cols-1 lg:grid-cols-[minmax(auto,50.4rem)_auto_18.5rem]'>
           <div className='pr-0 lg:pr-4'>
             <p className='text-xl-bold md:display-sm-bold mb-4 text-neutral-900 md:mb-6'>
               Recommend For You
             </p>
 
-            {posts.map((post) => (
+            {postsRecommended.map((post) => (
               <div
                 key={post.id}
                 className='border-b border-neutral-300 py-4 first-of-type:pt-0 md:py-6'
@@ -45,11 +49,11 @@ const Home = () => {
           <div className='mt-4.5 mb-6 h-1.5 w-[calc(100%+10%)] justify-self-center bg-neutral-300 lg:mt-0 lg:mb-0 lg:block lg:h-full lg:w-px'></div>
 
           <div className='pl-0 lg:pl-4'>
-            <p className='text-xl-bold md:display-sm-bold mb-4 text-neutral-900 lg:mb-5'>
+            <p className='text-xl-bold md:display-xs-bold mb-4 text-neutral-900 lg:mb-5'>
               Most Liked
             </p>
             <div className='divide-y divide-neutral-300'>
-              {postsLiked.map((post) => (
+              {postsMostLiked.map((post) => (
                 <div key={post.id} className='py-4 first-of-type:pt-0 md:py-5'>
                   <Aside {...post} />
                 </div>
@@ -59,11 +63,11 @@ const Home = () => {
         </div>
       </main>
       {/* <Footer /> */}
-    </div>
+    </>
   );
 };
 
-// export default HomePage;
+export default Home;
 
 const Aside: React.FC<Post> = ({ title, content, likes, comments }) => {
   return (
@@ -94,5 +98,3 @@ const Aside: React.FC<Post> = ({ title, content, likes, comments }) => {
     </aside>
   );
 };
-
-export default Home;

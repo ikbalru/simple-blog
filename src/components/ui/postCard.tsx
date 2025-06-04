@@ -1,16 +1,7 @@
 import Image from 'next/image';
 import React from 'react';
 
-interface Post {
-  author: { name: string };
-  createdAt: string;
-  imageUrl: string;
-  title: string;
-  tags: string[];
-  content: string;
-  likes: number;
-  comments: number;
-}
+import { Post } from '@/models/post';
 
 const BlogPostCard: React.FC<Post> = ({
   author,
@@ -26,16 +17,18 @@ const BlogPostCard: React.FC<Post> = ({
     <div className='w-full'>
       <div className='flex items-center gap-6'>
         {/* image post */}
-        <Image
-          src={imageUrl}
-          alt={title}
-          width={340}
-          height={258}
-          className='pointer-events-none hidden object-cover lg:block'
-        />
+        <div className='relative hidden h-64.5 w-85 overflow-hidden rounded-sm lg:block'>
+          <Image
+            src={imageUrl}
+            alt={title}
+            fill
+            sizes='100%'
+            className='pointer-events-none object-cover'
+          />
+        </div>
 
         {/* content description */}
-        <div>
+        <div className='w-full lg:max-w-110.75'>
           <p className='text-md-bold md:text-xl-bold'>{title}</p>
 
           <div className='mt-2 flex h-7 flex-wrap gap-x-2 overflow-hidden md:mt-3'>
@@ -58,7 +51,7 @@ const BlogPostCard: React.FC<Post> = ({
             {/* profile */}
             <div className='flex items-center gap-2'>
               {/* image profile */}
-              <div className='h-7.5 w-7.5 shrink-0 rounded-full bg-neutral-400 md:h-10 md:w-10'></div>
+              <div className='h-7.5 w-7.5 shrink-0 overflow-hidden rounded-full bg-neutral-400 md:h-10 md:w-10'></div>
 
               <p className='text-xs-regular md:text-sm-medium text-neutral-900'>
                 {author.name}

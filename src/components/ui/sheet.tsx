@@ -3,11 +3,28 @@
 import * as SheetPrimitive from '@radix-ui/react-dialog';
 import { XIcon } from 'lucide-react';
 import * as React from 'react';
+import { useMedia } from 'react-use';
 
 import { cn } from '@/lib/utils';
 
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
-  return <SheetPrimitive.Root data-slot='sheet' {...props} />;
+  const isDesktop = useMedia('(min-width: 1024px)', false);
+  const [open, setOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    if (isDesktop) {
+      setOpen(false);
+    }
+  }, [isDesktop]);
+
+  return (
+    <SheetPrimitive.Root
+      data-slot='sheet'
+      open={open}
+      onOpenChange={setOpen}
+      {...props}
+    />
+  );
 }
 
 function SheetTrigger({
