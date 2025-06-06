@@ -6,10 +6,10 @@ import { Post } from '@/models/post';
 
 export type SearchPostsQueryKey = [
   string,
+  string,
   {
     query: string;
     limit?: number;
-    page?: number;
   },
 ];
 
@@ -22,17 +22,19 @@ export type SearchPostsResponse = {
 
 export const SearchPosts: QueryFunction<
   SearchPostsResponse,
-  SearchPostsQueryKey
-> = async ({ queryKey }) => {
-  const [path, { query, limit = 5, page = 1 }] = queryKey;
+  SearchPostsQueryKey,
+  number
+> = async ({ queryKey, pageParam = 1 }) => {
+  const [path, subPath, { query, limit }] = queryKey;
 
-  const apiPath = `${path}`;
+  const apiPath = `/${path}/${subPath}`;
 
   const axiosRequestConfig: AxiosRequestConfig = {
-    params: { query, limit, page },
+    params: { query, limit, page: pageParam },
   };
 
   const response = await api.get(apiPath, axiosRequestConfig);
+  console.log('axios: ', response.data);
 
   return response.data;
 };

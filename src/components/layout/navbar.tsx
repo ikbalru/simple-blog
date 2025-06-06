@@ -9,7 +9,6 @@ import { useSelector } from 'react-redux';
 
 import { selectUser } from '@/store/redux/auth/auth.selector';
 import { logout } from '@/store/redux/auth/auth.slice';
-import { selectSearchQuery } from '@/store/redux/search/search.selector';
 import { useAppDispatch } from '@/store/redux/store';
 
 import { Button } from '../ui/button';
@@ -31,39 +30,38 @@ import {
 const Navbar = () => {
   const user = useSelector(selectUser);
 
-  const searchQuery = useSelector(selectSearchQuery);
-
   return (
-    <div className='bg-base-white fixed top-0 z-50 h-16 w-full border-b border-neutral-300 md:h-20'>
+    <header className='bg-base-white fixed top-0 z-50 h-16 w-full border-b border-neutral-300 md:h-20'>
       <div className='custom-container flex h-full items-center justify-between gap-4'>
-        <Image
-          src='/images/logo.svg'
-          alt='company-log'
-          width={105}
-          height={24}
-          className='shrink-0 lg:h-9 lg:w-39.5'
-        />
+        <Link href='/' aria-label='home'>
+          <Image
+            src='/images/logo.svg'
+            alt='company-log'
+            width={105}
+            height={24}
+            className='shrink-0 cursor-pointer lg:h-9 lg:w-39.5'
+          />
+        </Link>
 
         {/* search bar */}
-        {/* <div className='hidden h-12 w-93.25 items-center gap-2 rounded-xl border border-neutral-300 px-4 py-2.5 lg:flex'>
-          <Search className='size-6 cursor-pointer text-neutral-500' />
-          <Input placeholder='Search' className='focus:outline-none' />
-        </div> */}
-        <SearchBar value={searchQuery} />
+        <SearchBar />
 
         {/* action buttons */}
-        <div className='hidden items-center space-x-6 lg:flex'>
+        <nav className='hidden items-center space-x-6 lg:flex'>
           {!user ? (
             <Button asChild variant='link' size='link'>
               <Link href='/login'>Login</Link>
             </Button>
           ) : (
-            <button className='text-primary-300 flex cursor-pointer items-center gap-2'>
+            <Link
+              href='#'
+              className='text-primary-300 flex cursor-pointer items-center gap-2'
+            >
               <PenLine className='size-6' />
-              <p className='text-sm-semibold underline underline-offset-3'>
+              <span className='text-sm-semibold underline underline-offset-3'>
                 Write Post
-              </p>
-            </button>
+              </span>
+            </Link>
           )}
 
           {/* Divider */}
@@ -75,24 +73,39 @@ const Navbar = () => {
             </Button>
           ) : (
             <DropDownMenu>
-              <div className='flex cursor-pointer items-center gap-3 outline-none'>
-                <div className='size-10 rounded-full bg-neutral-400'></div>
-                <p className='text-sm-medium text-neutral-900'>John Doe</p>
-              </div>
+              <button
+                aria-label='profile'
+                className='flex cursor-pointer items-center gap-3 outline-none'
+              >
+                {user.avatarUrl ? (
+                  <Image
+                    src={user.avatarUrl}
+                    alt='profile'
+                    width={40}
+                    height={40}
+                    className='cursor-pointer rounded-full'
+                  />
+                ) : (
+                  <div className='size-10 cursor-pointer rounded-full bg-neutral-400'></div>
+                )}
+                <p className='text-sm-medium text-neutral-900'>{user.name}</p>
+              </button>
             </DropDownMenu>
           )}
-        </div>
+        </nav>
 
         {/* mobile */}
         <div className='flex items-center gap-6 text-neutral-950 lg:hidden'>
-          {/* mobile menu sheet */}
+          {/* mobile menu non login */}
           {!user ? (
             <>
               <Search className='size-6 cursor-pointer' />
 
               <Sheet>
-                <SheetTrigger>
-                  <Menu className='size-6 cursor-pointer' />
+                <SheetTrigger asChild>
+                  <button className='cursor-pointer' aria-label='menu'>
+                    <Menu className='size-6 cursor-pointer' />
+                  </button>
                 </SheetTrigger>
                 <SheetContent>
                   <SheetHeader>
@@ -120,13 +133,26 @@ const Navbar = () => {
               </Sheet>
             </>
           ) : (
+            // mobile menu login
             <DropDownMenu>
-              <div className='size-10 cursor-pointer rounded-full bg-neutral-400'></div>
+              <button className='cursor-pointer' aria-label='profile'>
+                {user.avatarUrl ? (
+                  <Image
+                    src={user.avatarUrl}
+                    alt='profile'
+                    width={40}
+                    height={40}
+                    className='cursor-pointer rounded-full'
+                  />
+                ) : (
+                  <div className='size-10 cursor-pointer rounded-full bg-neutral-400'></div>
+                )}
+              </button>
             </DropDownMenu>
           )}
         </div>
       </div>
-    </div>
+    </header>
   );
 };
 
@@ -145,36 +171,32 @@ const DropDownMenu: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>{children}</DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem>
-          <button className='flex cursor-pointer items-center gap-2'>
-            <Image
-              src='/icons/user-icon.svg'
-              alt='user-icon'
-              width={16}
-              height={16}
-              className='md:size-5'
-            />
-            Profile
-          </button>
+        <DropdownMenuItem className='flex cursor-pointer items-center gap-2'>
+          <Image
+            src='/icons/user-icon.svg'
+            alt='user-icon'
+            width={16}
+            height={16}
+            className='md:size-5'
+          />
+          Profile
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <button
-            onClick={() => {
-              handleLogout();
-            }}
-            className='flex cursor-pointer items-center gap-2'
-          >
-            <Image
-              src='/icons/log-out-icon.svg'
-              alt='log-out-icon'
-              width={16}
-              height={16}
-              className='md:size-5'
-            />
-            Logout
-          </button>
+        <DropdownMenuItem
+          className='flex cursor-pointer items-center gap-2'
+          onClick={() => {
+            handleLogout();
+          }}
+        >
+          <Image
+            src='/icons/log-out-icon.svg'
+            alt='log-out-icon'
+            width={16}
+            height={16}
+            className='md:size-5'
+          />
+          Logout
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -18,7 +18,7 @@ type UseGetPostsMostLikedReturn = {
   total: number;
   currentPage: number;
   lastPage: number | null;
-  isLoading: boolean;
+  isFetching: boolean;
   error: Error | null;
   queryKeyPostsMostLiked: PostsMostLikedQueryKey;
 };
@@ -28,11 +28,12 @@ export const useGetPostsMostLiked = ({
   page = 1,
 }: UseGetPostsMostLikedParams = {}): UseGetPostsMostLikedReturn => {
   const queryKeyPostsMostLiked: PostsMostLikedQueryKey = [
-    '/posts/most-liked',
+    'posts',
+    'most-liked',
     { limit, page },
   ];
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isFetching, error } = useQuery({
     queryKey: queryKeyPostsMostLiked,
     queryFn: getPostsMostLiked,
   });
@@ -47,7 +48,7 @@ export const useGetPostsMostLiked = ({
     total,
     currentPage,
     lastPage,
-    isLoading,
+    isFetching,
     error,
     queryKeyPostsMostLiked,
   };

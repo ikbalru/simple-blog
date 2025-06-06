@@ -5,16 +5,20 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'flex flex-center disabled:pointer-events-none disabled:opacity-50 cursor-pointer outline-none shrink-0 font-semibold',
+  'flex flex-center cursor-pointer outline-none shrink-0 disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
-        default: 'bg-primary-300 text-base-white rounded-full',
-        destructive:
-          'bg-[#EE1D52] text-neutral-950 text-base-white rounded-full',
+        default:
+          'bg-primary-300 !text-base-white rounded-full text-sm-semibold',
+        destructive: 'bg-[#EE1D52] text-neutral-950 rounded-full',
         ghost:
           'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
-        link: 'text-primary-300 underline-offset-4 underline hover:text-primary-200',
+        outline:
+          'bg-primary-300 !text-neutral-25 rounded-full text-xs-regular md:text-sm-regular',
+        noOutline:
+          'bg-base-white hover:bg-primary-100 !text-neutral-900 rounded-full text-xs-regular md:text-sm-regular',
+        link: '!text-primary-300 underline-offset-4 underline hover:!text-primary-200 text-xs-regular md:text-sm-regular',
       },
       size: {
         default: 'h-11 w-45.5',
@@ -22,6 +26,7 @@ const buttonVariants = cva(
         lg: 'h-12 w-88',
         link: 'w-fit',
         icon: 'h-6 w-6',
+        page: 'h-12 min-w-12',
       },
     },
     defaultVariants: {

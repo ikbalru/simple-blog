@@ -6,6 +6,7 @@ import { Post } from '@/models/post';
 
 export type PostsMostLikedQueryKey = [
   string,
+  string,
   {
     limit?: number;
     page?: number;
@@ -23,9 +24,9 @@ export const getPostsMostLiked: QueryFunction<
   PostsMostLikedResponse,
   PostsMostLikedQueryKey
 > = async ({ queryKey }) => {
-  const [path, { limit = 3, page = 1 }] = queryKey;
+  const [path, subPath, { limit = 3, page = 1 }] = queryKey;
 
-  const apiPath = `${path}`;
+  const apiPath = `/${path}/${subPath}`;
 
   const axiosRequestConfig: AxiosRequestConfig = {
     params: { limit, page },

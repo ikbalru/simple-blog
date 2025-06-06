@@ -205,10 +205,10 @@
 /* ---------------------------------------- */
 /* end of shadcn theme */
 /* ---------------------------------------- */
-
+/* 
 html {
   scroll-behavior: smooth;
-}
+} */
 
 body {
   @apply bg-base-white text-sm font-normal text-neutral-950;

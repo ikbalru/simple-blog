@@ -27,6 +27,7 @@ const fontWeights = {
 const customTextPlugin = plugin(({ addUtilities }) => {
   const newUtilities: Record<string, any> = {};
 
+  // Create standard prefixed utilities
   for (const [sizeName, sizeVar] of Object.entries(textSizes)) {
     for (const [weightName, weightVar] of Object.entries(fontWeights)) {
       const className = `.${sizeName}-${weightName}`;

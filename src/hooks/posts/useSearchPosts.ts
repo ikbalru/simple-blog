@@ -1,57 +1,62 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 
-import { Post } from '@/models/post';
 import { SearchPosts, SearchPostsQueryKey } from '@/services/posts/searchPosts';
 
 type UseSearchPostsParams = {
   query: string;
   limit?: number;
-  page?: number;
 };
 
-type UseSearchPostsReturn = {
-  postsSearch: Post[];
-  total: number;
-  currentPage: number;
-  lastPage: number | null;
-  isFetching: boolean;
-  error: Error | null;
-  queryKeySearchPosts: SearchPostsQueryKey;
-};
+// type UseSearchPostsReturn = {
+//   postsSearch: Post[];
+//   fetchNextPage: () => Promise<unknown>;
+//   hasNextPage: boolean;
+//   isFetchingNextPage: boolean;
+//   isLoading: boolean;
+//   error: Error | null;
+//   queryKeySearchPosts: SearchPostsQueryKey;
+// };
 
-export const useSearchPosts = ({
-  query,
-  limit = 5,
-  page = 1,
-}: UseSearchPostsParams): UseSearchPostsReturn => {
+export const useSearchPosts = ({ query, limit = 5 }: UseSearchPostsParams) => {
   const queryKeySearchPosts: SearchPostsQueryKey = [
-    '/posts/search',
+    'posts',
+    'search',
     {
-      query,
+      query: query.trim(),
       limit,
-      page,
     },
   ];
 
-  const { data, error, isFetching } = useQuery({
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    error,
+  } = useInfiniteQuery({
     queryKey: queryKeySearchPosts,
     queryFn: SearchPosts,
-    enabled: !!query, // Only fetch when search is defined
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.lastPage) {
+        return lastPage.page + 1;
+      }
+      return undefined;
+    },
+    enabled: !!query.trim(), // Only fetch when query is defined and not empty
   });
 
-  const postsSearch = data?.data ?? [];
-  const total = data?.total ?? 0;
-  const currentPage = data?.page ?? 1;
-  const lastPage = data?.lastPage ?? null;
+  const postsSearch = data?.pages.flatMap((page) => page.data) ?? [];
 
   return {
     postsSearch,
-    total,
-    currentPage,
-    lastPage,
-    isFetching,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
     error,
     queryKeySearchPosts,
   };

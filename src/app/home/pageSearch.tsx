@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React from 'react';
 
-import Footer from '@/components/layout/footer';
 import Navbar from '@/components/layout/navbar';
 import { Button } from '@/components/ui/button';
 import PostCard from '@/components/ui/postCard';
@@ -66,20 +65,6 @@ const Search = () => {
 
           <SearchBar className='block lg:hidden' />
 
-          {/* first loading data */}
-          {isLoading && (
-            <p className='text-md-regular mt-10 h-[100vh] text-neutral-900'>
-              Please wait while data being load...
-            </p>
-          )}
-
-          {/* Error */}
-          {error && (
-            <p className='text-md-regular mt-10 h-[100vh] text-neutral-900'>
-              Error loading posts: {error.message}
-            </p>
-          )}
-
           {postsSearch.length > 0 ? (
             // search result
             <ul className='mt-4 lg:mt-6' ref={containerRef}>
@@ -92,11 +77,6 @@ const Search = () => {
                   <PostCard {...post} />
                 </li>
               ))}
-              {!isFetchingNextPage && !hasNextPage && (
-                <p className='text-xs-regular md:text-sm-regular mx-auto mt-5 mb-10 text-center text-neutral-400'>
-                  You have reached the end of the list.
-                </p>
-              )}
             </ul>
           ) : (
             // not found search
@@ -125,17 +105,137 @@ const Search = () => {
             </div>
           )}
 
+          {/* first loading data */}
+          {isLoading && (
+            <p className='text-md-regular mt-10 h-[100vh] text-neutral-900'>
+              Please wait while data being load...
+            </p>
+          )}
+
           {/* fetching other data */}
           {isFetchingNextPage && (
             <p className='text-md-regular mt-10 h-[100vh] text-neutral-900'>
               Load More...
             </p>
           )}
+
+          {/* Error */}
+          {error && (
+            <p className='text-md-regular mt-10 h-[100vh] text-neutral-900'>
+              Error loading posts: {error.message}
+            </p>
+          )}
         </section>
       </main>
-      <Footer />
     </>
   );
 };
 
 export default Search;
+
+// search post.ts:
+import { QueryFunction } from '@tanstack/react-query';
+import { AxiosRequestConfig } from 'axios';
+
+import { api } from '@/lib/api/axios';
+import { Post } from '@/models/post';
+
+export type SearchPostsQueryKey = [
+  string,
+  string,
+  {
+    query: string;
+    limit?: number;
+  },
+];
+
+export type SearchPostsResponse = {
+  data: Post[];
+  total: number;
+  page: number;
+  lastPage: number;
+};
+
+export const SearchPosts: QueryFunction<
+  SearchPostsResponse,
+  SearchPostsQueryKey,
+  number
+> = async ({ queryKey, pageParam = 1 }) => {
+  const [path, subPath, { query, limit }] = queryKey;
+
+  const apiPath = `/${path}/${subPath}`;
+
+  const axiosRequestConfig: AxiosRequestConfig = {
+    params: { query, limit, page: pageParam },
+  };
+
+  const response = await api.get(apiPath, axiosRequestConfig);
+  console.log('axios: ', response.data);
+
+  return response.data;
+};
+
+// useSearchPosts.ts
+('use client');
+
+import { useInfiniteQuery } from '@tanstack/react-query';
+
+import { SearchPosts, SearchPostsQueryKey } from '@/services/posts/searchPosts';
+
+type UseSearchPostsParams = {
+  query: string;
+  limit?: number;
+};
+
+// type UseSearchPostsReturn = {
+//   postsSearch: Post[];
+//   fetchNextPage: () => Promise<unknown>;
+//   hasNextPage: boolean;
+//   isFetchingNextPage: boolean;
+//   isLoading: boolean;
+//   error: Error | null;
+//   queryKeySearchPosts: SearchPostsQueryKey;
+// };
+
+export const useSearchPosts = ({ query, limit = 5 }: UseSearchPostsParams) => {
+  const queryKeySearchPosts: SearchPostsQueryKey = [
+    'posts',
+    'search',
+    {
+      query: query.trim(),
+      limit,
+    },
+  ];
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    error,
+  } = useInfiniteQuery({
+    queryKey: queryKeySearchPosts,
+    queryFn: SearchPosts,
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.lastPage) {
+        return lastPage.page + 1;
+      }
+      return undefined;
+    },
+    enabled: !!query.trim(), // Only fetch when query is defined and not empty
+  });
+
+  const postsSearch = data?.pages.flatMap((page) => page.data) ?? [];
+
+  return {
+    postsSearch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    error,
+    queryKeySearchPosts,
+  };
+};

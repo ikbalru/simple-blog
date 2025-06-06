@@ -28,7 +28,8 @@ export const useGetPostsRecommended = ({
   page = 1,
 }: UseGetPostsRecommendedParams = {}): UseGetPostsRecommendedReturn => {
   const queryKeyPostsRecommended: PostsRecommendedQueryKey = [
-    '/posts/recommended',
+    'posts',
+    'recommended',
     { limit, page },
   ];
 
@@ -41,6 +42,8 @@ export const useGetPostsRecommended = ({
   const total = data?.total ?? 0;
   const currentPage = data?.page ?? 1;
   const lastPage = data?.lastPage ?? null;
+
+  console.log('postsRecommended: ', postsRecommended);
 
   return {
     postsRecommended,

@@ -30,7 +30,8 @@ const registerFormSchema = z
         required_error: 'Name is required',
       })
       .min(2, 'Name must be at least 2 characters long')
-      .max(50, 'Name must be at most 50 characters long'),
+      .max(50, 'Name must be at most 50 characters long')
+      .refine((value) => value.trim() !== '', 'Name is required'),
     email: z
       .string({
         required_error: 'Email is required',
@@ -91,9 +92,9 @@ const RegisterForm: React.FC = () => {
 
   return (
     <main className='custom-container flex-center flex h-[100vh]'>
-      <div className='shadow-card w-86.25 space-y-5 overflow-hidden rounded-xl border border-neutral-200 p-6 md:w-90'>
+      <section className='shadow-card w-86.25 space-y-5 overflow-hidden rounded-xl border border-neutral-200 p-6 md:w-90'>
         {/* tilte */}
-        <p className='text-xl-bold text-neutral-900'>Sign In</p>
+        <h1 className='text-xl-bold text-neutral-900'>Sign In</h1>
 
         {accountExists && (
           <p className='text-xs-regular text-[#EE1D52]'>
@@ -250,7 +251,7 @@ const RegisterForm: React.FC = () => {
               )}
             />
 
-            <Button disabled={isLoading} className='h-12 w-full'>
+            <Button type='submit' disabled={isLoading} className='h-12 w-full'>
               {isLoading ? <MoonLoader size={16} color='#fff' /> : 'Register'}
             </Button>
           </form>
@@ -261,7 +262,7 @@ const RegisterForm: React.FC = () => {
             <Link href='/login'>Login</Link>
           </span>
         </p>
-      </div>
+      </section>
     </main>
   );
 };

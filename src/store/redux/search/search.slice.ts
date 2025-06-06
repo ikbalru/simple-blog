@@ -13,7 +13,7 @@ export const searchSlice = createSlice({
   initialState,
   reducers: {
     setSearchQuery: (state, action: PayloadAction<string>) => {
-      state.query = action.payload.trim();
+      state.query = action.payload;
     },
   },
 });

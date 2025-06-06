@@ -8,6 +8,7 @@ import { Post } from '@/models/post';
 
 export type PostsRecommendedQueryKey = [
   string,
+  string,
   {
     limit?: number;
     page?: number;
@@ -25,15 +26,17 @@ export const getPostsRecommended: QueryFunction<
   PostsRecommendedResponse,
   PostsRecommendedQueryKey
 > = async ({ queryKey }) => {
-  const [path, { limit = 5, page = 1 }] = queryKey;
+  const [path, subPath, { limit = 5, page = 1 }] = queryKey;
 
-  const apiPath = `${path}`;
+  const apiPath = `/${path}/${subPath}`;
 
   const axiosRequestConfig: AxiosRequestConfig = {
     params: { limit, page },
   };
 
   const response = await api.get(apiPath, axiosRequestConfig);
+
+  console.log('axiosRecommended: ', response.data);
 
   return response.data;
 };
