@@ -1,9 +1,14 @@
+'use client';
+
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import React from 'react';
 
 import { Post } from '@/models/post';
 
-const BlogPostCard: React.FC<Post> = ({
+import SafeImage from './safeImage';
+
+const BlogPostCard = ({
   author,
   createdAt,
   imageUrl,
@@ -12,24 +17,30 @@ const BlogPostCard: React.FC<Post> = ({
   content,
   likes,
   comments,
-}) => {
-  const [formattedCreateAt, setFormattedCreateAt] = React.useState<string>('');
+  id,
+}: Post) => {
+  const router = useRouter();
 
-  React.useMemo(() => {
+  const formatDate = (createdAt: string | Date | undefined) => {
+    if (!createdAt) return '';
     const date = new Date(createdAt);
     const formattedDate = date.toLocaleDateString('en-GB', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
     });
-    setFormattedCreateAt(formattedDate);
-  }, [createdAt]);
+    return formattedDate;
+  };
+
+  const handleDetailedPost = () => {
+    router.push(`/posts/${id}`);
+  };
 
   return (
     <article className='flex h-fit w-full items-center gap-6 lg:h-69'>
       {/* image post */}
       <div className='relative hidden h-64.5 w-85 overflow-hidden rounded-sm lg:block'>
-        <Image
+        <SafeImage
           src={imageUrl}
           alt={title}
           fill
@@ -40,18 +51,23 @@ const BlogPostCard: React.FC<Post> = ({
 
       {/* content description */}
       <div className='w-full lg:max-w-110.75'>
-        <p className='text-md-bold md:text-xl-bold'>{title}</p>
+        <p
+          className='text-md-bold md:text-xl-bold cursor-pointer hover:underline hover:underline-offset-5'
+          onClick={handleDetailedPost}
+        >
+          {title}
+        </p>
 
-        <div className='mt-2 flex h-7 flex-wrap gap-x-2 overflow-hidden md:mt-3'>
-          {tags.map((tag) => (
-            <div
-              key={tag}
+        <ul className='mt-2 flex h-7 flex-wrap gap-x-2 overflow-hidden md:mt-3'>
+          {tags.map((tag, index) => (
+            <li
+              key={index}
               className='h-full rounded-md border border-neutral-300 px-2 py-0.5'
             >
               <p className='text-xs-regular text-neutral-900'>{tag}</p>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
 
         <p className='text-xs-regular md:text-sm-regular mt-2 line-clamp-2 text-neutral-900 md:mt-3'>
           {content}
@@ -64,6 +80,7 @@ const BlogPostCard: React.FC<Post> = ({
             {/* image profile */}
             <div className='h-7.5 w-7.5 shrink-0 overflow-hidden rounded-full bg-neutral-400 md:h-10 md:w-10'></div>
 
+            {/* name profile */}
             <p className='text-xs-regular md:text-sm-medium text-neutral-900'>
               {author.name}
             </p>
@@ -74,7 +91,7 @@ const BlogPostCard: React.FC<Post> = ({
 
           {/* time of create post */}
           <p className='text-xs-regular md:text-sm-regular text-neutral-600'>
-            {formattedCreateAt}
+            {formatDate(createdAt)}
           </p>
         </div>
 

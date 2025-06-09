@@ -23,7 +23,7 @@ import { Post } from '@/models/post';
 
 const Home = () => {
   const limitItem = 5;
-  const [currentPage, setCurrentPage] = React.useState(3);
+  const [currentPage, setCurrentPage] = React.useState(5);
 
   const {
     postsRecommended,
@@ -47,10 +47,12 @@ const Home = () => {
       <main className='custom-container mt-22 overflow-hidden lg:mt-32'>
         <section className='grid grid-cols-1 lg:grid-cols-[minmax(auto,50.4rem)_auto_18.5rem]'>
           <div className='pr-0 lg:pr-4'>
+            {/* title */}
             <h1 className='text-xl-bold md:display-sm-bold text-neutral-900'>
               Recommend For You
             </h1>
 
+            {/* posts */}
             <ul>
               {postsRecommended.map((post) => (
                 <li
@@ -96,6 +98,7 @@ const Home = () => {
           <div className='h-1.5 w-[calc(100%+10%)] justify-self-center bg-neutral-300 lg:hidden'></div>
 
           <aside className='pl-0 lg:pl-4'>
+            {/* aside title */}
             <h2 className='text-xl-bold md:display-xs-bold mb-4 text-neutral-900 max-lg:mt-6 lg:mb-5'>
               Most Liked
             </h2>
@@ -251,7 +254,7 @@ function PaginationSection({
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              href='#'
+              // href='#'
               onClick={handlePrevPage}
               disabled={currentPage === 1}
             />
@@ -264,7 +267,7 @@ function PaginationSection({
               return (
                 <PaginationItem key={pageOrEllipsis}>
                   <PaginationLink
-                    href='#'
+                    // href='#'
                     isActive={currentPage === pageOrEllipsis}
                     onClick={() => setCurrentPage(pageOrEllipsis)}
                   >
@@ -277,7 +280,7 @@ function PaginationSection({
 
           <PaginationItem>
             <PaginationNext
-              href='#'
+              // href='#'
               onClick={handleNextPage}
               disabled={currentPage === totalPageCount}
             />

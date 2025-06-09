@@ -18,6 +18,9 @@ const SearchBar = ({ className }: { className?: string }) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const query = searchQuery.trim();
+
+    if (!query) return;
+
     router.push(`/search?query=${encodeURIComponent(query)}`);
   };
 
@@ -26,6 +29,7 @@ const SearchBar = ({ className }: { className?: string }) => {
       onSubmit={handleSubmit}
       className={cn(
         'hidden h-12 w-full rounded-xl border border-neutral-300 px-4 py-2.5 lg:block lg:w-93.25',
+        'focus-within:border-primary-300 focus-within:ring-primary-300',
         className
       )}
     >
@@ -36,7 +40,6 @@ const SearchBar = ({ className }: { className?: string }) => {
         <Input
           type='search'
           placeholder='Search'
-          className='focus:outline-none'
           value={searchQuery}
           onChange={handleChange}
         />

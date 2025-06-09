@@ -1,5 +1,3 @@
-'use client';
-
 import { QueryFunction } from '@tanstack/react-query';
 
 import { api } from '@/lib/api/axios';
@@ -15,11 +13,7 @@ export const getUserProfile: QueryFunction<
 
   const apiPath = `${path}/${email}`;
 
-  console.log('apiPath: ', apiPath);
-
   const response = await api.get(apiPath);
-
-  console.log('response: ', response.data);
 
   return response.data;
 };

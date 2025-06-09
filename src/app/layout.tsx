@@ -26,6 +26,7 @@ export default function RootLayout({
     <html lang='en'>
       <body className={clsx(inter.variable, 'antialiased')}>
         <AppProvider>{children}</AppProvider>
+        <div id='portal'></div>
       </body>
     </html>
   );

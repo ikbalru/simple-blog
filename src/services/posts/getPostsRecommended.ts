@@ -1,5 +1,3 @@
-'use client';
-
 import { QueryFunction } from '@tanstack/react-query';
 import { AxiosRequestConfig } from 'axios';
 

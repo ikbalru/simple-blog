@@ -1,5 +1,3 @@
-'use client';
-
 import { useQuery } from '@tanstack/react-query';
 
 import { Post } from '@/models/post';
@@ -42,8 +40,6 @@ export const useGetPostsRecommended = ({
   const total = data?.total ?? 0;
   const currentPage = data?.page ?? 1;
   const lastPage = data?.lastPage ?? null;
-
-  console.log('postsRecommended: ', postsRecommended);
 
   return {
     postsRecommended,

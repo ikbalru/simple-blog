@@ -5,7 +5,6 @@ import { Post } from '@/models/post';
 
 export type GetPostByIdQueryKey = [
   string,
-  string,
   {
     id: number;
   },
@@ -14,9 +13,9 @@ export type GetPostByIdQueryKey = [
 export const GetPostById: QueryFunction<Post, GetPostByIdQueryKey> = async ({
   queryKey,
 }) => {
-  const [path, subPath, { id }] = queryKey;
+  const [path, { id }] = queryKey;
 
-  const apiPath = `/${path}/${subPath}/${id}`;
+  const apiPath = `/${path}/${id}`;
 
   const response = await api.get(apiPath);
 
