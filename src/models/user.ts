@@ -5,8 +5,8 @@ export const userSchema = z.object({
   name: z.string(),
   email: z.string(),
   password: z.string(),
-  headline: z.array(z.string()).optional().nullable(),
-  avatarUrl: z.string().url().optional().nullable(),
+  headline: z.string().nullable(),
+  avatarUrl: z.string().nullable(),
 });
 
 export type User = z.infer<typeof userSchema>;
@@ -14,3 +14,7 @@ export type User = z.infer<typeof userSchema>;
 export type loginUser = Omit<User, 'id' | 'avatarUrl' | 'headline' | 'name'>;
 
 export type registerUser = Omit<User, 'id' | 'avatarUrl' | 'headline'>;
+
+export type postLikeUser = Omit<User, 'email' | 'password'>;
+
+export type currentUser = Omit<User, 'password'>;

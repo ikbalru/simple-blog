@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -9,13 +10,40 @@ import Navbar from '@/components/layout/navbar';
 import SafeImage from '@/components/ui/safeImage';
 
 import { useGetPostById } from '@/hooks/posts/useGetPostById';
+import { useGetPostComment } from '@/hooks/posts/useGetPostComment';
+import { useGetPostLike } from '@/hooks/posts/useGetPostLikes';
+import { useUpdatePostLike } from '@/hooks/posts/usePostLikePostById';
+import { useGetUserProfile } from '@/hooks/users/useGetUserProfile';
+import { selectToken, selectUser } from '@/store/redux/auth/auth.selector';
+import { useAppSelector } from '@/store/redux/store';
 
 import Comments from './partial/comment';
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL as string;
+
 const PostbyId = () => {
   const params = useParams();
-  const { post, isFetching } = useGetPostById({ id: Number(params.postId) });
 
+  const { post, isFetching } = useGetPostById({
+    id: Number(params.postId),
+  });
+  const { user } = useGetUserProfile({
+    email: post?.author.email || '',
+  });
+  const { comments, queryKeyComments } = useGetPostComment({
+    postId: Number(params.postId),
+  });
+  const { likes, queryKeyPostLikes } = useGetPostLike({
+    postId: Number(params.postId),
+  });
+  const { updatePostLike } = useUpdatePostLike();
+  const currentUser = useAppSelector(selectUser);
+  const token = useAppSelector(selectToken);
+
+  // filter like Post for current user
+  const LikedPost = likes.find((like) => like.id === currentUser?.id) || null;
+
+  // format date function
   const formatDate = (createdAt: string | Date | undefined) => {
     if (!createdAt) return '';
     const date = new Date(createdAt);
@@ -25,6 +53,18 @@ const PostbyId = () => {
       day: 'numeric',
     });
     return formattedDate;
+  };
+
+  const handleLikePost = () => {
+    if (!token) {
+      alert('You must login first');
+      return;
+    }
+    updatePostLike({
+      postId: Number(params.postId),
+      queryKey: queryKeyPostLikes,
+      currentUser: currentUser!,
+    });
   };
 
   return (
@@ -63,7 +103,17 @@ const PostbyId = () => {
                 {/* profile */}
                 <div className='flex items-center gap-2'>
                   {/* image profile */}
-                  <div className='h-7.5 w-7.5 shrink-0 overflow-hidden rounded-full bg-neutral-400 md:h-10 md:w-10'></div>
+                  <Image
+                    src={
+                      user?.avatarUrl
+                        ? BASE_URL + user.avatarUrl
+                        : '/images/profile-dummy.jpg'
+                    }
+                    alt={post.author.name}
+                    width={40}
+                    height={40}
+                    className='cursor-pointer rounded-full'
+                  />
 
                   {/* name profile */}
                   <p className='text-xs-regular md:text-sm-medium text-neutral-900'>
@@ -85,27 +135,37 @@ const PostbyId = () => {
             <section className='flex items-center gap-3 py-3 md:gap-5 md:py-4'>
               {/* like */}
               <div className='flex items-center gap-1.5'>
-                <Image
-                  src='/icons/like-icon.svg'
-                  alt='like'
-                  width={20}
-                  height={20}
-                />
+                <button onClick={handleLikePost}>
+                  <Image
+                    src={
+                      LikedPost
+                        ? '/icons/like-active-icon.svg'
+                        : '/icons/like-icon.svg'
+                    }
+                    alt='like'
+                    width={20}
+                    height={20}
+                    className='shrink-0 cursor-pointer'
+                  />
+                </button>
                 <p className='text-xs-regular md:text-sm-regular text-neutral-600'>
-                  {post.likes}
+                  {likes.length}
                 </p>
               </div>
 
               {/* comment */}
               <div className='flex items-center gap-1.5'>
-                <Image
-                  src='/icons/comment-icon.svg'
-                  alt='comment'
-                  width={20}
-                  height={20}
-                />
+                <Link href='#comments'>
+                  <Image
+                    src='/icons/comment-icon.svg'
+                    alt='comment'
+                    width={20}
+                    height={20}
+                    className='shrink-0 cursor-pointer'
+                  />
+                </Link>
                 <p className='text-xs-regular md:text-sm-regular text-neutral-600'>
-                  {post.comments}
+                  {comments.length}
                 </p>
               </div>
             </section>
@@ -127,8 +187,15 @@ const PostbyId = () => {
             </section>
 
             {/* comments section */}
-            <Comments post={post} formatDate={formatDate} />
-
+            <section id='comments'>
+              <Comments
+                post={post}
+                comments={comments}
+                user={user}
+                formatDate={formatDate}
+                queryKeyComment={queryKeyComments}
+              />
+            </section>
             {/* related posts */}
             <section className='pt-3 md:pt-4'>
               <h2 className='text-xl-bold md:display-xs-bold pb-3 md:pb-4'>

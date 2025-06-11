@@ -1,67 +1,95 @@
 'use client';
 
 import { X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import React from 'react';
 
+import AvatarImage from '@/components/ui/avatarImage';
 import { Button } from '@/components/ui/button';
 import { Portal } from '@/components/ui/portal';
 import { Textarea } from '@/components/ui/textarea';
 
+import {
+  CreateCommentVariables,
+  useCreateComment,
+} from '@/hooks/posts/useCreateComment';
+import { Comment } from '@/models/comment';
 import { Post } from '@/models/post';
-
-const comment: any = [
-  {
-    id: 1,
-    name: 'Clarissa',
-    createdAt: '2025-06-07T11:24:25.000Z',
-    comment: 'This is a comment',
-  },
-  {
-    id: 2,
-    name: 'Marco',
-    createdAt: '2025-06-07T11:24:25.000Z',
-    comment:
-      'TExactly what I needed to read today. Frontend is evolving so fast!',
-  },
-  {
-    id: 3,
-    name: 'John Doe',
-    createdAt: '2025-06-07T11:24:25.000Z',
-    comment: '"Great breakdown! You made complex ideas sound simple."',
-  },
-  {
-    id: 4,
-    name: 'John Doe',
-    createdAt: '2025-06-07T11:24:25.000Z',
-    comment: '"Great breakdown! You made complex ideas sound simple."',
-  },
-];
+import { User } from '@/models/user';
+import { CommentsQueryKey } from '@/services/posts/getPostComment';
+import { selectToken, selectUser } from '@/store/redux/auth/auth.selector';
+import { useAppSelector } from '@/store/redux/store';
 
 type CommentsProps = {
   post: Post;
+  user: User | null;
+  comments: Comment[];
   formatDate: (createdAt: string | Date | undefined) => string;
+  queryKeyComment: CommentsQueryKey;
 };
 
-const Comments = ({ post, formatDate }: CommentsProps) => {
+const Comments = ({
+  post,
+  user,
+  comments,
+  formatDate,
+  queryKeyComment,
+}: CommentsProps) => {
+  const router = useRouter();
+
+  const currentUser = useAppSelector(selectUser);
+  const token = useAppSelector(selectToken);
+  const { createComment } = useCreateComment();
+
   const [open, setOpen] = React.useState(false);
+  const [comment, setComment] = React.useState('');
 
   const handleModalComment = () => {
-    console.log('modal comment');
     setOpen((prev) => !prev);
+  };
+
+  const handleOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log('query di kompoenen', queryKeyComment);
+
+    if (!token) {
+      alert('You must login first');
+      return router.push('/login');
+    }
+
+    const variables: CreateCommentVariables = {
+      postId: post.id,
+      payload: {
+        content: comment,
+      },
+      queryKey: queryKeyComment,
+      currentUser: currentUser!,
+    };
+
+    if (comment.trim()) {
+      createComment(variables);
+    }
+    setComment('');
   };
 
   return (
     <>
-      <section className='py-3 md:py-4'>
+      <div className='py-3 md:py-4'>
         {/* title comments */}
         <h2 className='md:display-xs-bold display-xl-bold'>
-          Comments({post.comments})
+          Comments({comments.length})
         </h2>
 
         {/* user profile */}
         <div className='flex items-center gap-2 py-3'>
           {/* image profile */}
-          <div className='h-7.5 w-7.5 shrink-0 overflow-hidden rounded-full bg-neutral-400 md:h-10 md:w-10'></div>
+          <AvatarImage
+            src={user?.avatarUrl || '/images/profile-dummy.jpg'}
+            alt={post.author.name}
+            width={40}
+            height={40}
+            className='cursor-pointer rounded-full'
+          />
 
           {/* name profile */}
           <p className='text-xs-semibold md:text-sm-semibold text-neutral-900'>
@@ -70,24 +98,30 @@ const Comments = ({ post, formatDate }: CommentsProps) => {
         </div>
 
         {/* form comment */}
-        <form className='flex flex-col gap-3'>
+        <form onSubmit={handleOnSubmit} className='flex flex-col gap-3'>
           {/* comment text */}
           <label className='text-sm-semibold text-neutral-950'>
             Give your Comments
           </label>
 
-          <Textarea placeholder='Enter your comment' />
+          <Textarea
+            placeholder='Enter your comment'
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+          />
 
-          <Button className='h-12 w-full self-end md:w-51'>Send</Button>
+          <Button type='submit' className='h-12 w-full self-end md:w-51'>
+            Send
+          </Button>
         </form>
-      </section>
+      </div>
 
       {/* comment lists section */}
-      {comment.length > 0 && (
-        <section className='py-3 md:py-4'>
+      {comments.length > 0 && (
+        <div className='py-3 md:py-4'>
           <ul className='divide-y divide-neutral-300'>
-            {comment.map(
-              (item: any, index: number) =>
+            {comments.map(
+              (item, index) =>
                 index < 3 && (
                   <li
                     key={item.id}
@@ -96,12 +130,20 @@ const Comments = ({ post, formatDate }: CommentsProps) => {
                     {/* comment */}
                     <div className='flex items-center gap-3'>
                       {/* image profile */}
-                      <div className='h-10 w-10 shrink-0 overflow-hidden rounded-full bg-neutral-400 md:h-12 md:w-12'></div>
+                      <AvatarImage
+                        src={
+                          item.author.avatarUrl || '/images/profile-dummy.jpg'
+                        }
+                        alt={item.author.name}
+                        width={40}
+                        height={40}
+                        className='shrink-0 cursor-pointer rounded-full object-cover md:h-12 md:w-12'
+                      />
 
                       <div>
                         {/* name profile */}
                         <p className='text-xs-semibold md:text-sm-semibold text-neutral-900'>
-                          {item.name}
+                          {item.author.name}
                         </p>
 
                         {/* time of create post */}
@@ -113,13 +155,13 @@ const Comments = ({ post, formatDate }: CommentsProps) => {
 
                     {/* comment text */}
                     <p className='md:text-sm-regular text-xs-regular mt-2 text-neutral-900'>
-                      {item.comment}
+                      {item.content}
                     </p>
                   </li>
                 )
             )}
           </ul>
-          {comment.length > 3 && (
+          {comments.length > 3 && (
             <Button
               variant='link'
               size='link'
@@ -129,11 +171,11 @@ const Comments = ({ post, formatDate }: CommentsProps) => {
               See All Comments
             </Button>
           )}
-        </section>
+        </div>
       )}
       {open && (
         <ModalComment
-          post={post}
+          comments={comments}
           formatDate={formatDate}
           isOpen={open}
           onClose={handleModalComment}
@@ -145,13 +187,15 @@ const Comments = ({ post, formatDate }: CommentsProps) => {
 
 export default Comments;
 
-type ModalCommentProps = CommentsProps & {
+type ModalCommentProps = {
+  comments: Comment[];
+  formatDate: (createdAt: string | Date | undefined) => string;
   isOpen: boolean;
   onClose: () => void;
 };
 
 export const ModalComment = ({
-  post,
+  comments,
   formatDate,
   isOpen,
   onClose,
@@ -170,9 +214,9 @@ export const ModalComment = ({
         >
           <div className='pb-4 md:pb-5'>
             {/* title comments */}
-            <div className='flex items-center justify-between gap-2'>
+            <div className='flex-between flex gap-2'>
               <h2 className='md:text-xl-bold text-md-bold'>
-                Comments({post.comments})
+                Comments({comments.length})
               </h2>
 
               {/* close modal */}
@@ -199,7 +243,7 @@ export const ModalComment = ({
           {/* comment lists section */}
           <div className='pt-3'>
             <ul className='divide-y divide-neutral-300'>
-              {comment.map((item: any) => (
+              {comments.map((item) => (
                 <li
                   key={item.id}
                   className='py-3 first-of-type:pt-0 last-of-type:pb-0'
@@ -207,12 +251,18 @@ export const ModalComment = ({
                   {/* comment */}
                   <div className='flex items-center gap-3'>
                     {/* image profile */}
-                    <div className='h-10 w-10 shrink-0 overflow-hidden rounded-full bg-neutral-400 md:h-12 md:w-12'></div>
+                    <AvatarImage
+                      src={item.author.avatarUrl || '/images/profile-dummy.jpg'}
+                      alt={item.author.name}
+                      width={40}
+                      height={40}
+                      className='cursor-pointer rounded-full md:h-12 md:w-12'
+                    />
 
                     <div>
                       {/* name profile */}
                       <p className='text-xs-semibold md:text-sm-semibold text-neutral-900'>
-                        {item.name}
+                        {item.author.name}
                       </p>
 
                       {/* time of create post */}
@@ -224,7 +274,7 @@ export const ModalComment = ({
 
                   {/* comment text */}
                   <p className='md:text-sm-regular text-xs-regular mt-2 text-neutral-900'>
-                    {item.comment}
+                    {item.content}
                   </p>
                 </li>
               ))}

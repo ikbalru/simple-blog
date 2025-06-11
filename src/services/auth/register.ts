@@ -16,8 +16,6 @@ export const postRegister: MutationFunction<
   RegisterResponse,
   RegisterParams
 > = async ({ payload }) => {
-  console.log('Sending register request:', payload);
-
   const response = await api.post('/auth/register', payload);
 
   return response.data;

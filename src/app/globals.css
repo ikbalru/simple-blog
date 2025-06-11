@@ -205,10 +205,10 @@
 /* ---------------------------------------- */
 /* end of shadcn theme */
 /* ---------------------------------------- */
-/* 
+
 html {
   scroll-behavior: smooth;
-} */
+}
 
 body {
   @apply bg-base-white text-sm font-normal text-neutral-950;
@@ -220,6 +220,10 @@ body {
   .custom-container {
     margin: 0 auto;
     @apply max-w-302 pr-6 pl-6;
+  }
+  .profile-container {
+    margin: 0 auto;
+    @apply max-w-206 pr-4 pl-4;
   }
 }
 

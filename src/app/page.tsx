@@ -2,6 +2,7 @@
 
 // import Footer from '@/components/layout/footer';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import React from 'react';
 
 import Footer from '@/components/layout/footer';
@@ -23,7 +24,7 @@ import { Post } from '@/models/post';
 
 const Home = () => {
   const limitItem = 5;
-  const [currentPage, setCurrentPage] = React.useState(5);
+  const [currentPage, setCurrentPage] = React.useState(1);
 
   const {
     postsRecommended,
@@ -133,10 +134,21 @@ const Home = () => {
 
 export default Home;
 
-const Aside: React.FC<Post> = ({ title, content, likes, comments }) => {
+const Aside: React.FC<Post> = ({ title, content, likes, comments, id }) => {
+  const router = useRouter();
+
+  const handleDetailedPost = () => {
+    router.push(`/posts/${id}`);
+  };
+
   return (
     <article className='w-full'>
-      <p className='text-md-bold text-neutral-900'>{title}</p>
+      <p
+        className='text-md-bold cursor-pointer text-neutral-900 hover:underline hover:underline-offset-5'
+        onClick={handleDetailedPost}
+      >
+        {title}
+      </p>
       <p className='text-xs-regular md:text-sm-regular mt-1 line-clamp-2 text-neutral-900'>
         {content}
       </p>
@@ -254,7 +266,6 @@ function PaginationSection({
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              // href='#'
               onClick={handlePrevPage}
               disabled={currentPage === 1}
             />
@@ -267,7 +278,6 @@ function PaginationSection({
               return (
                 <PaginationItem key={pageOrEllipsis}>
                   <PaginationLink
-                    // href='#'
                     isActive={currentPage === pageOrEllipsis}
                     onClick={() => setCurrentPage(pageOrEllipsis)}
                   >
@@ -280,7 +290,6 @@ function PaginationSection({
 
           <PaginationItem>
             <PaginationNext
-              // href='#'
               onClick={handleNextPage}
               disabled={currentPage === totalPageCount}
             />

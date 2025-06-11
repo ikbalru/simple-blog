@@ -10,7 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-primary-300 !text-base-white rounded-full text-sm-semibold',
+          'bg-primary-300 !text-neutral-25 rounded-full text-sm-semibold',
         destructive: 'bg-[#EE1D52] text-neutral-950 rounded-full',
         ghost:
           'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',

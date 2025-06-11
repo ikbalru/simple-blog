@@ -34,7 +34,6 @@ export const SearchPosts: QueryFunction<
   };
 
   const response = await api.get(apiPath, axiosRequestConfig);
-  console.log('axios: ', response.data);
 
   return response.data;
 };

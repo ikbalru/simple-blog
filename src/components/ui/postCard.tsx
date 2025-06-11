@@ -4,11 +4,14 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
+import { useGetUserProfile } from '@/hooks/users/useGetUserProfile';
 import { Post } from '@/models/post';
 
 import SafeImage from './safeImage';
 
-const BlogPostCard = ({
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL as string;
+
+const PostCard = ({
   author,
   createdAt,
   imageUrl,
@@ -20,6 +23,10 @@ const BlogPostCard = ({
   id,
 }: Post) => {
   const router = useRouter();
+
+  const { user } = useGetUserProfile({
+    email: author.email,
+  });
 
   const formatDate = (createdAt: string | Date | undefined) => {
     if (!createdAt) return '';
@@ -36,16 +43,23 @@ const BlogPostCard = ({
     router.push(`/posts/${id}`);
   };
 
+  const handleVisitProfile = () => {
+    router.push(`/visit-profile/${author.id}`);
+  };
+
   return (
     <article className='flex h-fit w-full items-center gap-6 lg:h-69'>
       {/* image post */}
-      <div className='relative hidden h-64.5 w-85 overflow-hidden rounded-sm lg:block'>
+      <div
+        className='group/post relative hidden h-64.5 w-85 cursor-pointer overflow-hidden rounded-sm lg:block'
+        onClick={handleDetailedPost}
+      >
         <SafeImage
           src={imageUrl}
           alt={title}
           fill
           sizes='100%'
-          className='pointer-events-none object-cover'
+          className='pointer-events-none object-cover transition-transform duration-400 ease-in-out group-hover/post:scale-110'
         />
       </div>
 
@@ -76,12 +90,25 @@ const BlogPostCard = ({
         {/* post account */}
         <div className='mt-3 flex items-center gap-3 md:mt-4'>
           {/* profile */}
-          <div className='flex items-center gap-2'>
+          <div
+            className='group/profile flex cursor-pointer items-center gap-2'
+            onClick={handleVisitProfile}
+          >
             {/* image profile */}
-            <div className='h-7.5 w-7.5 shrink-0 overflow-hidden rounded-full bg-neutral-400 md:h-10 md:w-10'></div>
+            <Image
+              src={
+                user?.avatarUrl
+                  ? BASE_URL + user.avatarUrl
+                  : '/images/profile-dummy.jpg'
+              }
+              alt={author.name}
+              width={40}
+              height={40}
+              className='cursor-pointer rounded-full'
+            />
 
             {/* name profile */}
-            <p className='text-xs-regular md:text-sm-medium text-neutral-900'>
+            <p className='text-xs-regular md:text-sm-medium text-neutral-900 group-hover/profile:underline group-hover/profile:underline-offset-3'>
               {author.name}
             </p>
           </div>
@@ -128,4 +155,4 @@ const BlogPostCard = ({
   );
 };
 
-export default BlogPostCard;
+export default PostCard;

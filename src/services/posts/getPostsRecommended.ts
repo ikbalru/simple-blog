@@ -34,7 +34,5 @@ export const getPostsRecommended: QueryFunction<
 
   const response = await api.get(apiPath, axiosRequestConfig);
 
-  console.log('axiosRecommended: ', response.data);
-
   return response.data;
 };

@@ -32,7 +32,7 @@ const Navbar = () => {
 
   return (
     <header className='bg-base-white fixed top-0 z-50 h-16 w-full border-b border-neutral-300 md:h-20'>
-      <div className='custom-container flex h-full items-center justify-between gap-4'>
+      <div className='custom-container flex-between flex h-full gap-4'>
         <Link href='/' aria-label='home'>
           <Image
             src='/images/logo.svg'
@@ -53,15 +53,14 @@ const Navbar = () => {
               <Link href='/login'>Login</Link>
             </Button>
           ) : (
-            <Link
-              href='#'
-              className='text-primary-300 flex cursor-pointer items-center gap-2'
-            >
-              <PenLine className='size-6' />
-              <span className='text-sm-semibold underline underline-offset-3'>
-                Write Post
-              </span>
-            </Link>
+            <Button asChild size='link' variant='link'>
+              <Link href='#' className='flex items-center gap-2'>
+                <PenLine className='size-6' />
+                <span className='text-sm-semibold underline underline-offset-3'>
+                  Write Post
+                </span>
+              </Link>
+            </Button>
           )}
 
           {/* Divider */}
@@ -77,17 +76,13 @@ const Navbar = () => {
                 aria-label='profile'
                 className='flex cursor-pointer items-center gap-3 outline-none'
               >
-                {user.avatarUrl ? (
-                  <Image
-                    src={user.avatarUrl}
-                    alt='profile'
-                    width={40}
-                    height={40}
-                    className='cursor-pointer rounded-full'
-                  />
-                ) : (
-                  <div className='size-10 cursor-pointer rounded-full bg-neutral-400'></div>
-                )}
+                <Image
+                  src={user.avatarUrl || '/images/profile-dummy.jpg'}
+                  alt='profile'
+                  width={40}
+                  height={40}
+                  className='cursor-pointer rounded-full'
+                />
                 <p className='text-sm-medium text-neutral-900'>{user.name}</p>
               </button>
             </DropDownMenu>
@@ -136,17 +131,13 @@ const Navbar = () => {
             // mobile menu login
             <DropDownMenu>
               <button className='cursor-pointer' aria-label='profile'>
-                {user.avatarUrl ? (
-                  <Image
-                    src={user.avatarUrl}
-                    alt='profile'
-                    width={40}
-                    height={40}
-                    className='cursor-pointer rounded-full'
-                  />
-                ) : (
-                  <div className='size-10 cursor-pointer rounded-full bg-neutral-400'></div>
-                )}
+                <Image
+                  src={user.avatarUrl || '/images/profile-dummy.jpg'}
+                  alt='profile'
+                  width={40}
+                  height={40}
+                  className='cursor-pointer rounded-full'
+                />
               </button>
             </DropDownMenu>
           )}

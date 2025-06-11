@@ -21,15 +21,12 @@ export const useGetUserProfile = ({
   email,
 }: UseGetUserProfileParams): UseGetUserProfileReturn => {
   const queryKeyUserProfile: GetUserProfileQueryKey = ['/users', { email }];
-  console.log('queryKeyUserProfile: ', queryKeyUserProfile);
 
   const { data, error, isFetching } = useQuery({
     queryKey: queryKeyUserProfile,
     queryFn: getUserProfile,
     enabled: !!email, // Only fetch when email is defined
   });
-
-  console.log('dataUseGet: ', data);
 
   const user = data ?? null;
 
