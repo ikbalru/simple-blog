@@ -9,7 +9,15 @@ export const userSchema = z.object({
   avatarUrl: z.string().nullable(),
 });
 
+export const userUpdatePasswordSchema = z.object({
+  currentPassword: z.string(),
+  newPassword: z.string(),
+  confirmPassword: z.string(),
+});
+
 export type User = z.infer<typeof userSchema>;
+
+export type userUpdatePassword = z.infer<typeof userUpdatePasswordSchema>;
 
 export type loginUser = Omit<User, 'id' | 'avatarUrl' | 'headline' | 'name'>;
 

@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import React from 'react';
 
 import { Button } from './button';
@@ -7,14 +6,20 @@ import { Button } from './button';
 type NotFoundProps = {
   title: string;
   subtitle: string;
-  buttonLabel: string;
+  imageButton?: React.ReactNode;
+  buttonLabel?: string;
+  onClick?: () => void;
 };
 
-const NotFound = ({ title, subtitle, buttonLabel }: NotFoundProps) => {
-  const router = useRouter();
-
+const NotFound = ({
+  title,
+  subtitle,
+  imageButton,
+  buttonLabel,
+  onClick,
+}: NotFoundProps) => {
   return (
-    <div className='flex-center flex h-[100vh] flex-col'>
+    <div className='flex-center flex h-[65vh] flex-col'>
       <Image
         src='/icons/document-icon.svg'
         alt='post-document'
@@ -24,14 +29,16 @@ const NotFound = ({ title, subtitle, buttonLabel }: NotFoundProps) => {
       />
       <p className='text-sm-semibold mt-6 text-neutral-950'>{title}</p>
       <p className='text-sm-regular mt-1 text-neutral-950'>{subtitle}</p>
-      <Button
-        className='mt-6 h-11 w-50 cursor-pointer md:h-12 md:w-93'
-        onClick={() => {
-          router.push('/');
-        }}
-      >
-        {buttonLabel}
-      </Button>
+
+      {buttonLabel && (
+        <Button
+          className='mt-6 flex h-11 w-60 cursor-pointer gap-2 md:h-12 md:w-50'
+          onClick={onClick}
+        >
+          {imageButton}
+          {buttonLabel}
+        </Button>
+      )}
     </div>
   );
 };

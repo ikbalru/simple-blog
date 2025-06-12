@@ -105,7 +105,10 @@ const Home = () => {
             </h2>
             <ul className='divide-y divide-neutral-300'>
               {postsMostLiked.map((post) => (
-                <li key={post.id} className='py-4 first-of-type:pt-0 md:py-5'>
+                <li
+                  key={post.id}
+                  className='py-4 first-of-type:pt-0 last-of-type:pb-0 md:py-5'
+                >
                   <Aside {...post} />
                 </li>
               ))}

@@ -2,6 +2,7 @@
 
 import { useInfiniteQuery } from '@tanstack/react-query';
 
+import { Post } from '@/models/post';
 import { SearchPosts, SearchPostsQueryKey } from '@/services/posts/searchPosts';
 
 type UseSearchPostsParams = {
@@ -9,17 +10,20 @@ type UseSearchPostsParams = {
   limit?: number;
 };
 
-// type UseSearchPostsReturn = {
-//   postsSearch: Post[];
-//   fetchNextPage: () => Promise<unknown>;
-//   hasNextPage: boolean;
-//   isFetchingNextPage: boolean;
-//   isLoading: boolean;
-//   error: Error | null;
-//   queryKeySearchPosts: SearchPostsQueryKey;
-// };
+type UseSearchPostsReturn = {
+  postsSearch: Post[];
+  fetchNextPage: () => Promise<unknown>;
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+  isLoading: boolean;
+  error: Error | null;
+  queryKeySearchPosts: SearchPostsQueryKey;
+};
 
-export const useSearchPosts = ({ query, limit = 5 }: UseSearchPostsParams) => {
+export const useSearchPosts = ({
+  query,
+  limit = 5,
+}: UseSearchPostsParams): UseSearchPostsReturn => {
   const queryKeySearchPosts: SearchPostsQueryKey = [
     'posts',
     'search',

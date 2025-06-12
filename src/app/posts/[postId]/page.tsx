@@ -6,12 +6,16 @@ import { useParams } from 'next/navigation';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
+import Footer from '@/components/layout/footer';
 import Navbar from '@/components/layout/navbar';
+import AvatarImage from '@/components/ui/avatarImage';
+import PostCard from '@/components/ui/postCard';
 import SafeImage from '@/components/ui/safeImage';
 
 import { useGetPostById } from '@/hooks/posts/useGetPostById';
 import { useGetPostComment } from '@/hooks/posts/useGetPostComment';
 import { useGetPostLike } from '@/hooks/posts/useGetPostLikes';
+import { useGetPostsRecommended } from '@/hooks/posts/useGetPostsRecommended';
 import { useUpdatePostLike } from '@/hooks/posts/usePostLikePostById';
 import { useGetUserProfile } from '@/hooks/users/useGetUserProfile';
 import { selectToken, selectUser } from '@/store/redux/auth/auth.selector';
@@ -19,29 +23,49 @@ import { useAppSelector } from '@/store/redux/store';
 
 import Comments from './partial/comment';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL as string;
+const random = Math.floor(Math.random() * 10) + 1;
 
 const PostbyId = () => {
   const params = useParams();
 
-  const { post, isFetching } = useGetPostById({
+  const {
+    post,
+    isFetching: isFetchingPost,
+    error: errorPost,
+  } = useGetPostById({
     id: Number(params.postId),
   });
   const { user } = useGetUserProfile({
     email: post?.author.email || '',
   });
-  const { comments, queryKeyComments } = useGetPostComment({
+  const {
+    comments,
+    queryKeyComments,
+    isFetching: isFetchingComment,
+    error: errorComment,
+  } = useGetPostComment({
     postId: Number(params.postId),
   });
   const { likes, queryKeyPostLikes } = useGetPostLike({
     postId: Number(params.postId),
   });
+  const {
+    postsRecommended,
+    isFetching: isFetchingRecommended,
+    error: errorRecommended,
+  } = useGetPostsRecommended({ page: random, limit: 2 });
+
   const { updatePostLike } = useUpdatePostLike();
   const currentUser = useAppSelector(selectUser);
   const token = useAppSelector(selectToken);
 
   // filter like Post for current user
   const LikedPost = likes.find((like) => like.id === currentUser?.id) || null;
+
+  // filter another Post
+  const anotherPost = postsRecommended.filter(
+    (post) => post.id !== Number(params.postId)
+  );
 
   // format date function
   const formatDate = (createdAt: string | Date | undefined) => {
@@ -69,12 +93,6 @@ const PostbyId = () => {
 
   return (
     <>
-      {/* Loading */}
-      {isFetching && (
-        <p className='text-md-regular mt-10 h-[100vh] text-neutral-900'>
-          Please wait while data being load...
-        </p>
-      )}
       <Navbar />
       <main className='mx-auto mt-20 max-w-208 divide-y divide-neutral-300 px-4 md:mt-32'>
         {post && (
@@ -103,12 +121,8 @@ const PostbyId = () => {
                 {/* profile */}
                 <div className='flex items-center gap-2'>
                   {/* image profile */}
-                  <Image
-                    src={
-                      user?.avatarUrl
-                        ? BASE_URL + user.avatarUrl
-                        : '/images/profile-dummy.jpg'
-                    }
+                  <AvatarImage
+                    src={user?.avatarUrl || '/images/profile-dummy.jpg'}
                     alt={post.author.name}
                     width={40}
                     height={40}
@@ -129,6 +143,19 @@ const PostbyId = () => {
                   </p>
                 </div>
               </div>
+
+              {/* fetching */}
+              {isFetchingPost && (
+                <p className='text-md-regular mt-10 h-[100vh] text-neutral-900'>
+                  Please wait while data being load...
+                </p>
+              )}
+              {/* Error */}
+              {errorPost && (
+                <p className='text-md-regular mt-10 h-[100vh] text-neutral-900'>
+                  Error loading posts: {errorPost.message}
+                </p>
+              )}
             </section>
 
             {/* engagement post */}
@@ -195,17 +222,49 @@ const PostbyId = () => {
                 formatDate={formatDate}
                 queryKeyComment={queryKeyComments}
               />
+
+              {/* Loading */}
+              {isFetchingComment && (
+                <p className='text-md-regular mt-10 h-[100vh] text-neutral-900'>
+                  Please wait while data being load...
+                </p>
+              )}
+              {/* Error */}
+              {errorComment && (
+                <p className='text-md-regular mt-10 h-[100vh] text-neutral-900'>
+                  Error loading posts: {errorComment.message}
+                </p>
+              )}
             </section>
+
             {/* related posts */}
             <section className='pt-3 md:pt-4'>
               <h2 className='text-xl-bold md:display-xs-bold pb-3 md:pb-4'>
                 Another Posts
               </h2>
               {/* postcard */}
+              {anotherPost.map((post) => (
+                <PostCard key={post.id} {...post} />
+              ))}
+
+              {/* Loading */}
+              {isFetchingRecommended && (
+                <p className='text-md-regular mt-10 h-[100vh] text-neutral-900'>
+                  Please wait while data being load...
+                </p>
+              )}
+              {/* Error */}
+              {errorRecommended && (
+                <p className='text-md-regular mt-10 h-[100vh] text-neutral-900'>
+                  Error loading posts: {errorRecommended.message}
+                </p>
+              )}
             </section>
           </>
         )}
       </main>
+
+      <Footer />
     </>
   );
 };

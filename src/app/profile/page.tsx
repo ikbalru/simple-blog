@@ -1,17 +1,28 @@
+'use client';
+
 import Image from 'next/image';
 import React from 'react';
 
+import Footer from '@/components/layout/footer';
 import Navbar from '@/components/layout/navbar';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { selectUser } from '@/store/redux/auth/auth.selector';
 import { useAppSelector } from '@/store/redux/store';
 
-import YourPost from './partials/youPosts';
+import ChangePassword from './partials/changePassword';
+import { ModalEditProfile } from './partials/profileModal';
+import YourPosts from './partials/yourPosts';
 
 const Page = () => {
   const user = useAppSelector(selectUser);
+
+  const [openEditProfile, setOpenEditProfile] = React.useState(false);
+
+  const handleModalEditProfile = () => {
+    setOpenEditProfile((prev) => !prev);
+  };
+
   return (
     <>
       <Navbar />
@@ -25,23 +36,26 @@ const Page = () => {
               alt='profile'
               width={40}
               height={40}
-              className='shrink-0 cursor-pointer rounded-full md:h-20 md:w-20'
+              className='aspect-ratio shrink-0 cursor-pointer overflow-hidden rounded-full md:h-20 md:w-20'
             />
 
             <div>
               {/* name profile */}
-              <p className='text-sm-bold md:text-lg-bold text-neutral-900'>
+              <h1 className='text-sm-bold md:text-lg-bold text-neutral-900'>
                 {user?.name || 'Guest'}
-              </p>
+              </h1>
               {/* accupation */}
               <p className='text-xs-regular md:text-md-regular text-neutral-900'>
                 {user?.headline || 'No headline'}
               </p>
             </div>
           </div>
-          <Button variant='link' size='link'>
+          <button
+            className='text-primary-300 text-sm-semibold hover:text-primary-200 cursor-pointer underline underline-offset-2'
+            onClick={handleModalEditProfile}
+          >
             Edit Profile
-          </Button>
+          </button>
         </section>
 
         {/* section tabs */}
@@ -52,14 +66,23 @@ const Page = () => {
               <TabsTrigger value='password'>Change Password</TabsTrigger>
             </TabsList>
             <TabsContent value='post'>
-              <YourPost />
+              <YourPosts />
             </TabsContent>
             <TabsContent value='password'>
-              Change your password here.
+              <ChangePassword />
             </TabsContent>
           </Tabs>
         </section>
+
+        {openEditProfile && (
+          <ModalEditProfile
+            isOpen={openEditProfile}
+            onClose={handleModalEditProfile}
+          />
+        )}
       </main>
+
+      <Footer />
     </>
   );
 };

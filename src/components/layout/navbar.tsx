@@ -11,6 +11,7 @@ import { selectUser } from '@/store/redux/auth/auth.selector';
 import { logout } from '@/store/redux/auth/auth.slice';
 import { useAppDispatch } from '@/store/redux/store';
 
+import AvatarImage from '../ui/avatarImage';
 import { Button } from '../ui/button';
 import {
   DropdownMenu,
@@ -76,7 +77,7 @@ const Navbar = () => {
                 aria-label='profile'
                 className='flex cursor-pointer items-center gap-3 outline-none'
               >
-                <Image
+                <AvatarImage
                   src={user.avatarUrl || '/images/profile-dummy.jpg'}
                   alt='profile'
                   width={40}
@@ -155,6 +156,9 @@ const DropDownMenu: React.FC<{ children: React.ReactNode }> = ({
   const dispatch = useAppDispatch();
   const router = useRouter();
 
+  const handleProfile = () => {
+    router.push('/profile');
+  };
   const handleLogout = () => {
     dispatch(logout());
     router.replace('/');
@@ -164,30 +168,35 @@ const DropDownMenu: React.FC<{ children: React.ReactNode }> = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem className='flex cursor-pointer items-center gap-2'>
-          <Image
-            src='/icons/user-icon.svg'
-            alt='user-icon'
-            width={16}
-            height={16}
-            className='md:size-5'
-          />
-          Profile
+        <DropdownMenuItem>
+          <button
+            onClick={handleProfile}
+            className='flex cursor-pointer items-center gap-2'
+          >
+            <Image
+              src='/icons/user-icon.svg'
+              alt='user-icon'
+              width={16}
+              height={16}
+              className='md:size-5'
+            />
+            Profile
+          </button>
         </DropdownMenuItem>
-        <DropdownMenuItem
-          className='flex cursor-pointer items-center gap-2'
-          onClick={() => {
-            handleLogout();
-          }}
-        >
-          <Image
-            src='/icons/log-out-icon.svg'
-            alt='log-out-icon'
-            width={16}
-            height={16}
-            className='md:size-5'
-          />
-          Logout
+        <DropdownMenuItem>
+          <button
+            onClick={handleLogout}
+            className='flex cursor-pointer items-center gap-2'
+          >
+            <Image
+              src='/icons/log-out-icon.svg'
+              alt='log-out-icon'
+              width={16}
+              height={16}
+              className='md:size-5'
+            />
+            Logout
+          </button>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

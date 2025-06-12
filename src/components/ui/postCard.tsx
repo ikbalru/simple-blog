@@ -7,9 +7,8 @@ import React from 'react';
 import { useGetUserProfile } from '@/hooks/users/useGetUserProfile';
 import { Post } from '@/models/post';
 
+import AvatarImage from './avatarImage';
 import SafeImage from './safeImage';
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL as string;
 
 const PostCard = ({
   author,
@@ -44,7 +43,7 @@ const PostCard = ({
   };
 
   const handleVisitProfile = () => {
-    router.push(`/visit-profile/${author.id}`);
+    router.push(`/visit-profile?email=${encodeURIComponent(author.email)}`);
   };
 
   return (
@@ -95,12 +94,8 @@ const PostCard = ({
             onClick={handleVisitProfile}
           >
             {/* image profile */}
-            <Image
-              src={
-                user?.avatarUrl
-                  ? BASE_URL + user.avatarUrl
-                  : '/images/profile-dummy.jpg'
-              }
+            <AvatarImage
+              src={user?.avatarUrl || '/images/profile-dummy.jpg'}
               alt={author.name}
               width={40}
               height={40}

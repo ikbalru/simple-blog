@@ -1,9 +1,8 @@
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { Post } from '@/models/post';
 import {
   getPostsRecommended,
-  getPostsRecommendedInfinite,
   PostsRecommendedQueryKey,
 } from '@/services/posts/getPostsRecommended';
 
@@ -50,48 +49,5 @@ export const useGetPostsRecommended = ({
     isFetching,
     error,
     queryKeyPostsRecommended,
-  };
-};
-
-export const useGetPostsRecommendedInfinite = ({
-  limit = 5,
-}: UseGetPostsRecommendedParams = {}) => {
-  const queryKeyPostInfinite: PostsRecommendedQueryKey = [
-    'posts',
-    'recommended',
-    { limit },
-  ];
-
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-    error,
-  } = useInfiniteQuery({
-    queryKey: queryKeyPostInfinite,
-    queryFn: getPostsRecommendedInfinite,
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      if (lastPage.page < lastPage.lastPage) {
-        return lastPage.page + 1;
-      }
-      return undefined;
-    },
-  });
-
-  const postsInfinite = data?.pages.flatMap((page) => page.data) ?? [];
-  const total = data?.pages[0].total ?? 0;
-
-  return {
-    postsInfinite,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-    error,
-    queryKeyPostInfinite,
-    total,
   };
 };

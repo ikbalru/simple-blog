@@ -74,6 +74,7 @@ const RegisterForm: React.FC = () => {
       setIsLoading(true);
       const { email } = await postRegister({ payload: values });
       if (email) {
+        alert('Account created successfully');
         router.push('/login');
       }
     } catch (error) {

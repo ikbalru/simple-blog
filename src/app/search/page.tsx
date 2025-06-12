@@ -1,12 +1,11 @@
 'use client';
 
-import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React from 'react';
 
 import Footer from '@/components/layout/footer';
 import Navbar from '@/components/layout/navbar';
-import { Button } from '@/components/ui/button';
+import NotFound from '@/components/ui/notFound';
 import PostCard from '@/components/ui/postCard';
 import SearchBar from '@/components/ui/searchBar';
 
@@ -100,29 +99,12 @@ const Search = () => {
             </ul>
           ) : (
             // not found search
-            <div className='flex-center flex h-[100vh] flex-col'>
-              <Image
-                src='/icons/document-icon.svg'
-                alt='post-document'
-                width={118}
-                height={135}
-                className='pointer-events-none'
-              />
-              <p className='text-sm-semibold mt-6 text-neutral-950'>
-                No results found
-              </p>
-              <p className='text-sm-regular mt-1 text-neutral-950'>
-                Try using different keywords
-              </p>
-              <Button
-                className='mt-6 h-11 w-50 cursor-pointer md:h-12 md:w-93'
-                onClick={() => {
-                  router.push('/');
-                }}
-              >
-                Back To Home
-              </Button>
-            </div>
+            <NotFound
+              title='No results found'
+              subtitle='Try using different keywords'
+              buttonLabel='Back To Home'
+              onClick={() => router.push('/')}
+            />
           )}
 
           {/* fetching other data */}

@@ -55,6 +55,7 @@ const LoginForm: React.FC = () => {
   React.useEffect(() => {
     if (user && !isFetching && token) {
       dispatch(login({ user, token }));
+      alert('Login successfully');
       router.replace('/');
     }
   }, [user, isFetching, dispatch, token, router]);

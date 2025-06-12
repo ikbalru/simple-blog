@@ -27,7 +27,7 @@ function PaginationContent({
     <ul
       data-slot='pagination-content'
       className={cn(
-        'mt-4 mb-4.5 flex flex-row items-center lg:mt-6 lg:mb-39',
+        'mt-4 mb-4.5 flex flex-row items-center lg:mt-6',
         className
       )}
       {...props}

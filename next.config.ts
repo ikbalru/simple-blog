@@ -10,6 +10,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'truthful-simplicity-production.up.railway.app',
+        port: '',
+        pathname: '/storage/**',
+      },
     ],
   },
 };
