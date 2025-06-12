@@ -1,326 +1,218 @@
-import { X, ThumbsUp, MessageSquare } from 'lucide-react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { X } from 'lucide-react';
 import Image from 'next/image';
 import React from 'react';
+import { useForm } from 'react-hook-form';
 import { MoonLoader } from 'react-spinners';
+import * as z from 'zod';
 
 import AvatarImage from '@/components/ui/avatarImage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Portal } from '@/components/ui/portal';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabsProfile';
 
-import { useGetPostComment } from '@/hooks/posts/useGetPostComment';
-import { useGetPostLike } from '@/hooks/posts/useGetPostLikes';
+import { useUpdateProfile } from '@/hooks/posts/useUpdateProfile';
 import { selectUser } from '@/store/redux/auth/auth.selector';
 import { useAppSelector } from '@/store/redux/store';
-
-interface ModalStatisticsProps {
-  postId: number;
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-interface ModalDeleteProps {
-  postId: number;
-  isOpen: boolean;
-  onClose: () => void;
-}
 
 interface ModalEditProfileProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export const ModalStatistics = ({
-  postId,
-  isOpen,
-  onClose,
-}: ModalStatisticsProps) => {
-  const { likes } = useGetPostLike({
-    postId,
-  });
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
 
-  const { comments } = useGetPostComment({
-    postId,
-  });
+// Define Zod schema for profile update
+const profileSchema = z.object({
+  name: z.string().min(1, 'Name is required').optional(),
+  headline: z.string().optional(),
+  avatar: z
+    .instanceof(FileList)
+    .refine(
+      (files) => files?.length === 0 || files?.length === 1,
+      'Please upload one file'
+    )
+    .refine(
+      (files) => files?.length === 0 || files?.[0]?.size <= MAX_FILE_SIZE,
+      `Max file size is 5MB`
+    )
+    .refine(
+      (files) =>
+        files?.length === 0 || ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
+      'Only .jpg, .jpeg, and .png formats are supported'
+    )
+    .optional(),
+});
 
-  if (!isOpen) return null;
-
-  // format date function
-  const formatDate = (createdAt: string | Date | undefined) => {
-    if (!createdAt) return '';
-    const date = new Date(createdAt);
-    const formattedDate = date.toLocaleDateString('en-GB', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-    return formattedDate;
-  };
-
-  return (
-    <Portal>
-      {/* overlay */}
-      <div
-        onClick={onClose}
-        className='flex-center fixed inset-0 z-50 flex overflow-hidden bg-[rgba(10,13,18,0.6)] px-6'
-      >
-        {/* start modal */}
-        <div
-          onClick={(e) => e.stopPropagation()}
-          className='no-scrollbar bg-base-white h-[85vh] w-full overflow-y-scroll rounded-2xl px-4 py-6 md:w-153.25 md:px-6'
-        >
-          <div className='flex-between flex items-center'>
-            <h3 className='text-md-bold md:text-xl-bold text-neutral-950'>
-              Statistics
-            </h3>
-            <button type='button' onClick={onClose}>
-              <X className='size-6 cursor-pointer text-neutral-950' />
-            </button>
-          </div>
-
-          {/* Tabs */}
-          <Tabs defaultValue='like' orientation='horizontal'>
-            <TabsList>
-              <TabsTrigger value='like' className='flex-center flex gap-1'>
-                <ThumbsUp className='size-5' />
-                Like
-              </TabsTrigger>
-              <TabsTrigger value='comment' className='flex-center flex gap-1'>
-                <MessageSquare className='size-5' />
-                Comment
-              </TabsTrigger>
-            </TabsList>
-
-            {/* Content Like */}
-            <TabsContent value='like'>
-              <p className='text-sm-bold md:text-lg-bold py-3 text-neutral-950 md:py-5'>
-                Like({likes.length})
-              </p>
-
-              <ul className='divide-y divide-neutral-300'>
-                {likes.map((like) => (
-                  <li
-                    key={like.id}
-                    className='flex items-center gap-2 py-3 first-of-type:pt-0 last-of-type:pb-0 md:gap-3'
-                  >
-                    {/* image profile */}
-                    <AvatarImage
-                      src={like.avatarUrl || '/images/profile-dummy.jpg'}
-                      alt='profile'
-                      width={40}
-                      height={40}
-                      className='shrink-0 cursor-pointer rounded-full md:h-12 md:w-12'
-                    />
-
-                    <div>
-                      {/* name profile */}
-                      <p className='text-xs-bold md:text-sm-bold text-neutral-900'>
-                        {like.name}
-                      </p>
-                      {/* accupation */}
-                      <p className='text-xs-regular md:text-sm-regular text-neutral-900'>
-                        {like.headline}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </TabsContent>
-
-            {/* Content Comment */}
-            <TabsContent value='comment'>
-              <p className='text-sm-bold md:text-lg-bold py-3 text-neutral-950 md:py-5'>
-                Comment({comments.length})
-              </p>
-              <ul className='divide-y divide-neutral-300'>
-                {comments.map((comment) => (
-                  <li
-                    key={comment.id}
-                    className='py-3 first-of-type:pt-0 last-of-type:pb-0'
-                  >
-                    {/* image profile */}
-                    <div className='flex items-center gap-2 md:gap-3'>
-                      <AvatarImage
-                        src={
-                          comment.author.avatarUrl ||
-                          '/images/profile-dummy.jpg'
-                        }
-                        alt='profile'
-                        width={40}
-                        height={40}
-                        className='shrink-0 cursor-pointer rounded-full md:h-12 md:w-12'
-                      />
-
-                      <div>
-                        {/* name profile */}
-                        <p className='text-xs-bold md:text-sm-bold text-neutral-900'>
-                          {comment.author.name}
-                        </p>
-                        {/* accupation */}
-                        <p className='text-xs-regular md:text-sm-regular text-neutral-600'>
-                          {formatDate(comment.createdAt)}
-                        </p>
-                      </div>
-                    </div>
-
-                    <p className='text-xs-regular md:text-sm-regular pt-2 text-neutral-900'>
-                      {comment.content}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </div>
-    </Portal>
-  );
-};
-
-interface ModalDeleteProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export const ModalDelete = ({ isOpen, onClose }: ModalDeleteProps) => {
-  if (!isOpen) return null;
-
-  return (
-    <Portal>
-      {/* overlay */}
-      <div
-        onClick={onClose}
-        className='flex-center fixed inset-0 z-50 flex overflow-hidden bg-[rgba(10,13,18,0.6)] px-6'
-      >
-        {/* start modal */}
-        <div
-          onClick={(e) => e.stopPropagation()}
-          className='no-scrollbar bg-base-white w-full overflow-y-scroll rounded-2xl px-4 py-6 md:w-153.25 md:px-6'
-        >
-          {/* header */}
-          <div className='flex-between flex items-center'>
-            <h3 className='text-md-bold md:text-xl-bold text-neutral-950'>
-              Delete
-            </h3>
-            <button type='button' onClick={onClose}>
-              <X className='size-6 cursor-pointer text-neutral-950' />
-            </button>
-          </div>
-
-          {/* content */}
-          <p className='md:text-md-regular text-sm-regular py-4 text-neutral-600 md:py-6'>
-            Are you sure to delete?
-          </p>
-
-          {/* action */}
-          <div className='item-center flex justify-end'>
-            <Button
-              variant='noOutline'
-              className='!text-sm-semibold h-12 w-42.75'
-            >
-              Cancel
-            </Button>
-            <Button variant='destructive' className='h-12 w-42.75'>
-              Delete
-            </Button>
-          </div>
-        </div>
-      </div>
-    </Portal>
-  );
-};
+type ProfileFormData = z.infer<typeof profileSchema>;
 
 export const ModalEditProfile = ({
   isOpen,
   onClose,
 }: ModalEditProfileProps) => {
   const user = useAppSelector(selectUser);
+  const [avatarPreview, setAvatarPreview] = React.useState<string>(
+    user?.avatarUrl || '/images/profile-dummy.jpg'
+  );
 
-  const [isLoading, setIsLoading] = React.useState(false);
+  // Use our optimistic update profile hook
+  const updateProfileMutation = useUpdateProfile();
+  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    watch,
+  } = useForm<ProfileFormData>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      name: user?.name || 'Guest',
+      headline: user?.headline || 'No Headline',
+    },
+  });
+
+  const avatarFile = watch('avatar');
+
+  // Update avatar preview when file is selected
+  React.useEffect(() => {
+    if (avatarFile?.[0]) {
+      const file = avatarFile[0];
+      const imageUrl = URL.createObjectURL(file);
+      setAvatarPreview(imageUrl);
+
+      return () => URL.revokeObjectURL(imageUrl);
+    }
+  }, [avatarFile]);
+
+  // Form submission handler
+  const onSubmit = async (data: ProfileFormData) => {
+    try {
+      // Prepare the payload for the mutation
+      const payload = {
+        name: data.name,
+        headline: data.headline,
+        avatar: data.avatar?.[0] || null
+      };
+      
+      // Call the mutation with optimistic updates
+      await updateProfileMutation.mutateAsync({ payload });
+      
+      // Log success message
+      console.log('Profile updated successfully');
+      
+      // Close modal on success
+      onClose();
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
     <Portal>
-      {/* overlay */}
       <div
         onClick={onClose}
-        className='flex-center fixed inset-0 z-50 flex overflow-hidden bg-[rgba(10,13,18,0.6)] px-6'
+        className='fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-[rgba(10,13,18,0.6)] px-6'
       >
-        {/* start modal */}
         <div
           onClick={(e) => e.stopPropagation()}
-          className='no-scrollbar bg-base-white w-full overflow-y-scroll rounded-2xl px-4 py-6 md:w-123.75 md:px-6'
+          className='w-full max-w-[495px] overflow-hidden rounded-2xl bg-white px-4 py-6 md:px-6'
         >
-          {/* header */}
-          <div className='flex-between flex items-center'>
-            <h3 className='text-md-bold md:text-xl-bold text-neutral-950'>
+          <div className='flex items-center justify-between'>
+            <h3 className='text-xl font-semibold text-neutral-950'>
               Edit Profile
             </h3>
             <button type='button' onClick={onClose}>
-              <X className='size-6 cursor-pointer text-neutral-950' />
+              <X className='h-6 w-6 cursor-pointer text-neutral-950' />
             </button>
           </div>
 
-          {/* form */}
-          <form className='space-y-5'>
-            {/* avatar */}
-            <div className='relative mx-auto w-fit cursor-pointer'>
-              <Image
-                src='/icons/camera-icon.svg'
-                alt='camera'
-                width={24}
-                height={24}
-                className='absolute bottom-0 left-1/2 translate-x-4 translate-y-1'
+          <form onSubmit={handleSubmit(onSubmit)} className='mt-6 space-y-5'>
+            <div className='relative mx-auto w-fit'>
+              <label htmlFor='avatar' className='cursor-pointer'>
+                <Image
+                  src='/icons/camera-icon.svg'
+                  alt='camera'
+                  width={24}
+                  height={24}
+                  className='absolute bottom-0 left-1/2 translate-x-4 translate-y-1'
+                />
+                <AvatarImage
+                  src={avatarPreview}
+                  alt='profile'
+                  width={80}
+                  height={80}
+                  className='mx-auto shrink-0 overflow-hidden rounded-full object-cover'
+                />
+              </label>
+              <input
+                id='avatar'
+                type='file'
+                accept='image/png,image/jpeg,image/jpg'
+                className='hidden'
+                disabled={isSubmitting}
+                {...register('avatar')}
               />
-              <AvatarImage
-                src={user?.avatarUrl || '/images/profile-dummy.jpg'}
-                alt='profile'
-                width={80}
-                height={80}
-                className='mx-auto shrink-0 rounded-full'
-              />
-
-              <Input type='file' disabled={isLoading} className='hidden' />
+              {errors.avatar && (
+                <p className='mt-1 text-sm text-red-500'>
+                  {errors.avatar.message}
+                </p>
+              )}
             </div>
 
             <div>
-              {/* name */}
-              <Label className='!text-sm-semibold pb-1 text-neutral-950'>
+              <Label
+                htmlFor='name'
+                className='mb-1 block text-sm font-semibold text-neutral-950'
+              >
                 Name
               </Label>
               <Input
+                id='name'
                 type='text'
                 placeholder='Enter your name'
-                disabled={isLoading}
-                value={user?.name || 'Guest'}
-                className='text-sm-regular rounded-xl border border-neutral-300 px-4 py-2.5 text-neutral-950 placeholder:text-neutral-500'
+                disabled={isSubmitting}
+                className='w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm text-neutral-950 placeholder:text-neutral-500'
+                {...register('name')}
               />
+              {errors.name && (
+                <p className='mt-1 text-sm text-red-500'>
+                  {errors.name.message}
+                </p>
+              )}
             </div>
 
-            {/* headline */}
             <div>
-              <Label className='!text-sm-semibold pb-1 text-neutral-950'>
+              <Label
+                htmlFor='headline'
+                className='mb-1 block text-sm font-semibold text-neutral-950'
+              >
                 Profile Headline
               </Label>
               <Input
+                id='headline'
                 type='text'
                 placeholder='Enter your headline'
-                disabled={isLoading}
-                value={user?.headline || 'No Headline'}
-                className='text-sm-regular rounded-xl border border-neutral-300 px-4 py-2.5 text-neutral-950 placeholder:text-neutral-500'
+                disabled={isSubmitting}
+                className='w-full rounded-xl border border-neutral-300 px-4 py-2.5 text-sm text-neutral-950 placeholder:text-neutral-500'
+                {...register('headline')}
               />
+              {errors.headline && (
+                <p className='mt-1 text-sm text-red-500'>
+                  {errors.headline.message}
+                </p>
+              )}
             </div>
 
-            {/* action */}
-            <Button type='submit' disabled={isLoading} className='h-12 w-full'>
-              {isLoading ? (
+            <Button
+              type='submit'
+              disabled={isSubmitting}
+              className='h-12 w-full bg-blue-500 text-white hover:bg-blue-600'
+            >
+              {isSubmitting ? (
                 <MoonLoader size={16} color='#fff' />
               ) : (
                 'Update Profile'

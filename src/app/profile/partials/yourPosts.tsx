@@ -13,7 +13,7 @@ import { useIntersectionObserver } from '@/hooks/general/useIntersectionObserver
 import { useGetPostsMyPostInfinite } from '@/hooks/posts/useGetMyPost';
 import { Post } from '@/models/post';
 
-import { ModalDelete, ModalStatistics } from './profileModal';
+import { ModalDelete, ModalStatistics } from './postsModal';
 
 const YourPost = () => {
   const router = useRouter();

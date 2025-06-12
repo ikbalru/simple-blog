@@ -26,3 +26,5 @@ export type registerUser = Omit<User, 'id' | 'avatarUrl' | 'headline'>;
 export type postLikeUser = Omit<User, 'email' | 'password'>;
 
 export type currentUser = Omit<User, 'password'>;
+
+export type profileUpdate = Omit<User, 'password' | 'email' | 'id'>;

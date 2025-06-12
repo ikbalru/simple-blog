@@ -15,13 +15,11 @@ export const updatePassword: MutationFunction<
   UpdatePasswordResponse,
   UpdatePasswordParams
 > = async ({ payload: { currentPassword, newPassword, confirmPassword } }) => {
-  console.log('payload', currentPassword, newPassword, confirmPassword);
   const response = await api.patch('/users/password', {
     currentPassword,
     newPassword,
     confirmPassword,
   });
-  console.log(response.data);
 
   return response.data;
 };
