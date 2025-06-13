@@ -98,7 +98,7 @@ const ChangePassword = () => {
                     * Current password is incorrect
                   </p>
                 )}
-                <FormLabel className='text-sm-semibold pb-1 text-neutral-950'>
+                <FormLabel className='!text-sm-semibold pb-1 text-neutral-950'>
                   Current Password
                 </FormLabel>
                 <div
@@ -139,7 +139,7 @@ const ChangePassword = () => {
             name='newPassword'
             render={({ field, fieldState }) => (
               <FormItem>
-                <FormLabel className='text-sm-semibold pb-1 text-neutral-950'>
+                <FormLabel className='!text-sm-semibold pb-1 text-neutral-950'>
                   New Password
                 </FormLabel>
                 <div
@@ -180,7 +180,7 @@ const ChangePassword = () => {
             name='confirmPassword'
             render={({ field, fieldState }) => (
               <FormItem>
-                <FormLabel className='text-sm-semibold pb-1 text-neutral-950'>
+                <FormLabel className='!text-sm-semibold pb-1 text-neutral-950'>
                   Confirm New Password
                 </FormLabel>
                 <div

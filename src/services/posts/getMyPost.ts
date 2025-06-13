@@ -4,7 +4,7 @@ import { AxiosRequestConfig } from 'axios';
 import { api } from '@/lib/api/axios';
 import { Post } from '@/models/post';
 
-export type PostsMyPostQueryKey = [
+export type GetMyPostQueryKey = [
   string,
   string,
   {
@@ -13,16 +13,16 @@ export type PostsMyPostQueryKey = [
   },
 ];
 
-export type PostsMyPostResponse = {
+export type GetMyPostResponse = {
   data: Post[];
   total: number;
   page: number;
   lastPage: number;
 };
 
-export const getPostsMyPostInfinite: QueryFunction<
-  PostsMyPostResponse,
-  PostsMyPostQueryKey,
+export const getMyPostInfinite: QueryFunction<
+  GetMyPostResponse,
+  GetMyPostQueryKey,
   number
 > = async ({ queryKey, pageParam = 1 }) => {
   const [path, subPath, { limit }] = queryKey;

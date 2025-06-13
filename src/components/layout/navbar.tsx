@@ -75,14 +75,14 @@ const Navbar = () => {
             <DropDownMenu>
               <button
                 aria-label='profile'
-                className='flex cursor-pointer items-center gap-3 outline-none'
+                className='flex h-20 cursor-pointer items-center gap-3 outline-none'
               >
                 <AvatarImage
                   src={user.avatarUrl || '/images/profile-dummy.jpg'}
                   alt='profile'
                   width={40}
                   height={40}
-                  className='cursor-pointer rounded-full'
+                  className='shrink-0 cursor-pointer rounded-full object-cover'
                 />
                 <p className='text-sm-medium text-neutral-900'>{user.name}</p>
               </button>

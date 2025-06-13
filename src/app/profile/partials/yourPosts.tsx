@@ -10,7 +10,7 @@ import NotFound from '@/components/ui/notFound';
 import SafeImage from '@/components/ui/safeImage';
 
 import { useIntersectionObserver } from '@/hooks/general/useIntersectionObserver';
-import { useGetPostsMyPostInfinite } from '@/hooks/posts/useGetMyPost';
+import { useGetMyPostsInfinite } from '@/hooks/posts/useGetMyPost';
 import { Post } from '@/models/post';
 
 import { ModalDelete, ModalStatistics } from './postsModal';
@@ -25,11 +25,9 @@ const YourPost = () => {
     fetchNextPage,
     hasNextPage,
     isLoading,
-  } = useGetPostsMyPostInfinite({
+  } = useGetMyPostsInfinite({
     limit: 5,
   });
-
-  console.log(postsInfinite);
 
   const { containerRef, lastElementRef } = useIntersectionObserver<
     HTMLLIElement,
@@ -61,20 +59,22 @@ const YourPost = () => {
       </div>
 
       {/* posts */}
-      <ul
-        className='divide-y divide-neutral-300 pt-4 md:pt-5'
-        ref={containerRef}
-      >
-        {postsInfinite.map((post, index) => (
-          <li
-            key={post.id}
-            className='py-4 first-of-type:pt-0 last-of-type:pb-0 md:py-6'
-            ref={index === postsInfinite.length - 1 ? lastElementRef : null}
-          >
-            <PostCardUser {...post} />
-          </li>
-        ))}
-      </ul>
+      {postsInfinite.length > 0 && (
+        <ul
+          className='divide-y divide-neutral-300 pt-4 md:pt-5'
+          ref={containerRef}
+        >
+          {postsInfinite.map((post, index) => (
+            <li
+              key={post.id}
+              className='py-4 first-of-type:pt-0 last-of-type:pb-0 md:py-6'
+              ref={index === postsInfinite.length - 1 ? lastElementRef : null}
+            >
+              <PostCardUser {...post} />
+            </li>
+          ))}
+        </ul>
+      )}
 
       {/* loading fetching data */}
       {isFetchingNextPage ||

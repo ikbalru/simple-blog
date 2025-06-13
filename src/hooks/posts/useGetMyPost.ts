@@ -1,8 +1,8 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 
 import {
-  getPostsMyPostInfinite,
-  PostsMyPostQueryKey,
+  getMyPostInfinite,
+  GetMyPostQueryKey,
 } from '@/services/posts/getMyPost';
 
 type UseGetPostsMyPostParams = {
@@ -10,10 +10,10 @@ type UseGetPostsMyPostParams = {
   page?: number;
 };
 
-export const useGetPostsMyPostInfinite = ({
+export const useGetMyPostsInfinite = ({
   limit = 5,
 }: UseGetPostsMyPostParams = {}) => {
-  const queryKeyMyPostInfinite: PostsMyPostQueryKey = [
+  const queryKeyMyPostInfinite: GetMyPostQueryKey = [
     'posts',
     'my-posts',
     { limit },
@@ -28,7 +28,7 @@ export const useGetPostsMyPostInfinite = ({
     error,
   } = useInfiniteQuery({
     queryKey: queryKeyMyPostInfinite,
-    queryFn: getPostsMyPostInfinite,
+    queryFn: getMyPostInfinite,
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       if (lastPage.page < lastPage.lastPage) {

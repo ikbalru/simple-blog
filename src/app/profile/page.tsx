@@ -1,10 +1,10 @@
 'use client';
 
-import Image from 'next/image';
 import React from 'react';
 
 import Footer from '@/components/layout/footer';
 import Navbar from '@/components/layout/navbar';
+import AvatarImage from '@/components/ui/avatarImage';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { selectUser } from '@/store/redux/auth/auth.selector';
@@ -31,12 +31,12 @@ const Page = () => {
         <section className='flex-between flex rounded-[0.8125rem] border border-neutral-300 px-4 py-3.25 md:px-6 md:py-4'>
           <div className='flex items-center gap-2 md:gap-3'>
             {/* image profile */}
-            <Image
+            <AvatarImage
               src={user?.avatarUrl || '/images/profile-dummy.jpg'}
               alt='profile'
               width={40}
               height={40}
-              className='aspect-ratio shrink-0 cursor-pointer overflow-hidden rounded-full md:h-20 md:w-20'
+              className='aspect-ratio shrink-0 overflow-hidden rounded-full md:h-20 md:w-20'
             />
 
             <div>
@@ -61,7 +61,7 @@ const Page = () => {
         {/* section tabs */}
         <section className='pt-4 md:pt-5'>
           <Tabs defaultValue='post' orientation='horizontal'>
-            <TabsList>
+            <TabsList className='h-10 w-full md:h-12 md:w-88.5'>
               <TabsTrigger value='post'>Your Post</TabsTrigger>
               <TabsTrigger value='password'>Change Password</TabsTrigger>
             </TabsList>

@@ -223,7 +223,7 @@ body {
   }
   .profile-container {
     margin: 0 auto;
-    @apply max-w-206 pr-4 pl-4;
+    @apply max-w-208 pr-4 pl-4;
   }
 }
 

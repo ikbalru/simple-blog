@@ -26,7 +26,7 @@ const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
 
 // Define Zod schema for profile update
 const profileSchema = z.object({
-  name: z.string().min(1, 'Name is required').optional(),
+  name: z.string().min(3, 'Name is required').optional(),
   headline: z.string().optional(),
   avatar: z
     .instanceof(FileList)
@@ -46,8 +46,6 @@ const profileSchema = z.object({
     .optional(),
 });
 
-type ProfileFormData = z.infer<typeof profileSchema>;
-
 export const ModalEditProfile = ({
   isOpen,
   onClose,
@@ -59,13 +57,13 @@ export const ModalEditProfile = ({
 
   // Use our optimistic update profile hook
   const updateProfileMutation = useUpdateProfile();
-  
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     watch,
-  } = useForm<ProfileFormData>({
+  } = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       name: user?.name || 'Guest',
@@ -87,21 +85,21 @@ export const ModalEditProfile = ({
   }, [avatarFile]);
 
   // Form submission handler
-  const onSubmit = async (data: ProfileFormData) => {
+  const onSubmit = async (data: z.infer<typeof profileSchema>) => {
     try {
       // Prepare the payload for the mutation
       const payload = {
         name: data.name,
         headline: data.headline,
-        avatar: data.avatar?.[0] || null
+        avatar: data.avatar?.[0] || null,
       };
-      
+
       // Call the mutation with optimistic updates
       await updateProfileMutation.mutateAsync({ payload });
-      
+
       // Log success message
       console.log('Profile updated successfully');
-      
+
       // Close modal on success
       onClose();
     } catch (error) {

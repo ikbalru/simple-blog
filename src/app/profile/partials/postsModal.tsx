@@ -4,13 +4,10 @@ import React from 'react';
 import AvatarImage from '@/components/ui/avatarImage';
 import { Button } from '@/components/ui/button';
 import { Portal } from '@/components/ui/portal';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabsProfile';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
+import { useDeletePost } from '@/hooks/posts/useDeletePost';
+import { useGetMyPostsInfinite } from '@/hooks/posts/useGetMyPost';
 import { useGetPostComment } from '@/hooks/posts/useGetPostComment';
 import { useGetPostLike } from '@/hooks/posts/useGetPostLikes';
 
@@ -76,7 +73,7 @@ export const ModalStatistics = ({
 
           {/* Tabs */}
           <Tabs defaultValue='like' orientation='horizontal'>
-            <TabsList>
+            <TabsList className='h-12 w-full'>
               <TabsTrigger value='like' className='flex-center flex gap-1'>
                 <ThumbsUp className='size-5' />
                 Like
@@ -176,10 +173,20 @@ export const ModalStatistics = ({
 interface ModalDeleteProps {
   isOpen: boolean;
   onClose: () => void;
+  postId: number;
 }
 
-export const ModalDelete = ({ isOpen, onClose }: ModalDeleteProps) => {
+export const ModalDelete = ({ isOpen, onClose, postId }: ModalDeleteProps) => {
+  const { deletePost } = useDeletePost();
+  const { queryKeyMyPostInfinite } = useGetMyPostsInfinite();
+
   if (!isOpen) return null;
+
+  const handleDeletePost = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    deletePost({ id: postId, queryKey: queryKeyMyPostInfinite });
+    onClose();
+  };
 
   return (
     <Portal>
@@ -213,10 +220,15 @@ export const ModalDelete = ({ isOpen, onClose }: ModalDeleteProps) => {
             <Button
               variant='noOutline'
               className='!text-sm-semibold h-12 w-42.75'
+              onClick={() => onClose()}
             >
               Cancel
             </Button>
-            <Button variant='destructive' className='h-12 w-42.75'>
+            <Button
+              variant='destructive'
+              className='h-12 w-42.75'
+              onClick={handleDeletePost}
+            >
               Delete
             </Button>
           </div>

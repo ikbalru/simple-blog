@@ -113,7 +113,6 @@ const Home = () => {
                 </li>
               ))}
             </ul>
-
             {/* Loading */}
             {isFetchingMostLiked && (
               <p className='text-md-regular mt-10 h-[100vh] text-neutral-900'>

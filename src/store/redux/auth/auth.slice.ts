@@ -46,7 +46,18 @@ export const authSlice = createSlice({
       state.token = null;
       localStorage.removeItem('token');
     },
+
+    updateUser: (state, action: PayloadAction<Partial<User>>) => {
+      if (state.user) {
+        // Update only the provided fields
+        const updatedUser = { ...state.user, ...action.payload };
+        state.user = updatedUser;
+        
+        // Update in localStorage
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      }
+    },
   },
 });
 
-export const { login, logout } = authSlice.actions;
+export const { login, logout, updateUser } = authSlice.actions;
