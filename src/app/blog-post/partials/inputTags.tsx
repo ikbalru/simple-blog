@@ -7,8 +7,13 @@ import { Input } from '@/components/ui/input';
 
 import { cn } from '@/lib/utils';
 
-const InputTags = () => {
-  const [tags, setTags] = React.useState<string[]>([]);
+interface InputTagsProps {
+  tags: string[];
+  setTags: (tags: string[]) => void;
+  disabled?: boolean;
+}
+
+const InputTags = ({ tags, setTags, disabled = false }: InputTagsProps) => {
   const [tagDelete, setTagDelete] = React.useState(false);
   const [isFocused, setIsFocused] = React.useState(false);
 
@@ -35,6 +40,10 @@ const InputTags = () => {
     }
 
     if (e.key === 'Enter' && value !== '') {
+      // Prevent form submission when adding tag with Enter
+      e.preventDefault();
+
+      // Always allow adding tags - Zod will handle validation
       setTags([...tags, value]);
       e.currentTarget.value = '';
     }
@@ -48,7 +57,7 @@ const InputTags = () => {
   return (
     <div
       className={cn(
-        'group group:focus-visible:ring-primary-300 group:focus-visible:ring-2 flex flex-wrap items-center gap-2 rounded-xl border px-4 py-2.5',
+        'flex flex-wrap items-center gap-2 rounded-xl border px-4 py-2.5 transition-colors',
         isFocused ? 'border-primary-300' : 'border-neutral-300'
       )}
     >
@@ -72,7 +81,9 @@ const InputTags = () => {
         placeholder='Enter your tags'
         onKeyDown={handleInputTag}
         onFocus={() => setIsFocused(true)}
-        className='placeholder:text-sm-regular group w-fit flex-grow !text-neutral-950 placeholder:text-neutral-500'
+        onBlur={() => setIsFocused(false)}
+        disabled={disabled}
+        className='placeholder:text-sm-regular w-fit flex-grow !text-neutral-950 placeholder:text-neutral-500'
       />
     </div>
   );

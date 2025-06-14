@@ -1,7 +1,6 @@
 'use client';
 
 import { PenLine } from 'lucide-react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
@@ -38,15 +37,20 @@ const YourPost = () => {
     isFetchingNextPage,
   });
 
+  const handleClickWritePost = () => {
+    router.push('/blog-post/write-post');
+  };
+
   return (
     <section className='pt-4 md:divide-y md:divide-neutral-300 md:pt-5'>
       {/* header */}
       <div className='flex-between flex flex-row-reverse flex-wrap md:pb-5'>
-        <Button asChild className='h-11 w-full md:w-45.5'>
-          <Link href='#' className='flex gap-2'>
-            <PenLine className='size-5' />
-            <span className='text-sm-semibold'>Write Post</span>
-          </Link>
+        <Button
+          className='h-11 w-full md:w-45.5'
+          onClick={handleClickWritePost}
+        >
+          <PenLine className='size-5' />
+          <span className='text-sm-semibold'>Write Post</span>
         </Button>
 
         {/* divider */}
@@ -150,6 +154,10 @@ export const PostCardUser = ({
     router.push(`/posts/${id}`);
   };
 
+  const handleClickEditPost = (id: number) => {
+    router.push(`/blog-post/edit-post/${id}`);
+  };
+
   return (
     <article className='flex h-fit w-full items-center gap-6 lg:h-69'>
       {/* image post */}
@@ -215,7 +223,10 @@ export const PostCardUser = ({
             Statistic
           </button>
           <div className='h-5.75 w-px bg-neutral-300'></div>
-          <button className='text-sm-semibold text-primary-300 hover:text-primary-200 cursor-pointer underline underline-offset-2'>
+          <button
+            className='text-sm-semibold text-primary-300 hover:text-primary-200 cursor-pointer underline underline-offset-2'
+            onClick={() => handleClickEditPost(id)}
+          >
             Edit
           </button>
           <div className='h-5.75 w-px bg-neutral-300'></div>

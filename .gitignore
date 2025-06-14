@@ -45,7 +45,6 @@ next-env.d.ts
 dummy.tsx
 loginForm.tsx
 RegisterForm.tsx
-toggle.tsx
 
 # exclude specific app directories
 # /src/app/blog-post/

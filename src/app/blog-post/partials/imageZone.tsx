@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import React, { useState, useEffect, useCallback } from 'react';
-import { useDropzone, FileRejection, Accept } from 'react-dropzone';
+import { useDropzone, Accept } from 'react-dropzone';
 
 // --- Reusable ImageDropzone Component ---
 // It is a 'controlled' component, receiving its state via props.
@@ -16,27 +16,30 @@ interface ImageDropzoneProps {
   value: File | null;
   onChange: (file: File | null) => void;
   className?: string;
+  disabled?: boolean;
+  // Add imageUrl for displaying images from API in edit mode
+  imageUrl?: string;
 }
 
-const MAX_SIZE_MB = 5;
-const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+const MAX_SIZE_MB = 5; // Match Zod validation in page.tsx (5MB)
 const ACCEPTED_FILES: Accept = {
   'image/jpeg': ['.jpg', '.jpeg'],
   'image/png': ['.png'],
 };
 
-function ImageDropzone({ value, onChange, className }: ImageDropzoneProps) {
+function ImageDropzone({
+  value,
+  onChange,
+  className,
+  disabled = false,
+  imageUrl,
+}: ImageDropzoneProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [isFocused, setIsFocused] = useState(false);
 
   const onDrop = useCallback(
-    (acceptedFiles: File[], fileRejections: FileRejection[]) => {
-      if (fileRejections.length > 0) {
-        // In a real app, use a toast notification library like 'sonner' or 'react-hot-toast'
-        alert(`Error: ${fileRejections[0].errors[0].message}`);
-        return;
-      }
-
+    (acceptedFiles: File[]) => {
+      // Accept any file - Zod will handle validation
       if (acceptedFiles.length > 0) {
         onChange(acceptedFiles[0]);
       }
@@ -44,10 +47,16 @@ function ImageDropzone({ value, onChange, className }: ImageDropzoneProps) {
     [onChange]
   );
 
-  const { getRootProps, getInputProps, isDragActive, open, isFocused: dropzoneFocused } = useDropzone({
+  const {
+    getRootProps,
+    getInputProps,
+    isDragActive,
+    open,
+    isFocused: dropzoneFocused,
+  } = useDropzone({
     onDrop,
     accept: ACCEPTED_FILES,
-    maxSize: MAX_SIZE_BYTES,
+    // Remove maxSize to let any size file be uploaded - Zod will handle validation
     maxFiles: 1,
     // This is key: It disables the default click-to-open behavior when a file is present.
     noClick: !!value,
@@ -55,14 +64,20 @@ function ImageDropzone({ value, onChange, className }: ImageDropzoneProps) {
   });
 
   useEffect(() => {
-    if (!value) {
+    // Handle both File objects and image URLs from the API
+    if (value) {
+      // If we have a File object, create object URL
+      const objectUrl = URL.createObjectURL(value);
+      setPreview(objectUrl);
+      return () => URL.revokeObjectURL(objectUrl);
+    } else if (imageUrl) {
+      // If we have an image URL from the API, use that directly
+      setPreview(imageUrl);
+    } else {
+      // No image available
       setPreview(null);
-      return;
     }
-    const objectUrl = URL.createObjectURL(value);
-    setPreview(objectUrl);
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [value]);
+  }, [value, imageUrl]);
 
   const handleRemove = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevents the file dialog from opening on click
@@ -82,16 +97,16 @@ function ImageDropzone({ value, onChange, className }: ImageDropzoneProps) {
   return (
     <div
       {...getRootProps()}
-      className={`rounded-xl border-2 border-dashed ${isDragActive || isFocused ? 'border-primary-300' : 'border-neutral-300'} ${!value ? 'cursor-pointer' : ''} ${className} transition-colors`}
+      className={`rounded-xl border-2 border-dashed bg-neutral-50 ${isDragActive || isFocused ? 'border-primary-300' : 'border-neutral-300'} ${!value ? 'cursor-pointer' : ''} ${className} transition-colors`}
     >
-      <input {...getInputProps()} />
-      {preview && value ? (
+      <input {...getInputProps()} disabled={disabled} />
+      {preview ? (
         // --- PREVIEW STATE (Gambar sudah ada) ---
         <div className='relative p-2'>
           <div className='relative mx-auto aspect-video overflow-hidden rounded-md'>
             <Image
               src={preview}
-              alt={value.name}
+              alt={value?.name || 'Post cover image'}
               fill
               sizes='100%'
               className='object-contain'

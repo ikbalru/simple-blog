@@ -4,7 +4,7 @@ import Image, { ImageProps } from 'next/image';
 import React from 'react';
 
 const FALLBACK_IMAGE = '/images/profile-dummy.jpg';
-const BASE_URL = 'https://truthful-simplicity-production.up.railway.app';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL as string;
 
 // safely change image while the image original error
 const AvatarImage = (props: ImageProps) => {

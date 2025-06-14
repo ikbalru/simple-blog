@@ -30,6 +30,11 @@ import {
 
 const Navbar = () => {
   const user = useSelector(selectUser);
+  const router = useRouter();
+
+  const handleClickWritePost = () => {
+    router.push('/blog-post/write-post');
+  };
 
   return (
     <header className='bg-base-white fixed top-0 z-50 h-16 w-full border-b border-neutral-300 md:h-20'>
@@ -54,13 +59,16 @@ const Navbar = () => {
               <Link href='/login'>Login</Link>
             </Button>
           ) : (
-            <Button asChild size='link' variant='link'>
-              <Link href='#' className='flex items-center gap-2'>
-                <PenLine className='size-6' />
-                <span className='text-sm-semibold underline underline-offset-3'>
-                  Write Post
-                </span>
-              </Link>
+            <Button
+              size='link'
+              variant='link'
+              onClick={handleClickWritePost}
+              className='flex items-center gap-2'
+            >
+              <PenLine className='size-6' />
+              <span className='text-sm-semibold underline underline-offset-3'>
+                Write Post
+              </span>
             </Button>
           )}
 

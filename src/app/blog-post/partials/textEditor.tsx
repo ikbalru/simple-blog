@@ -5,11 +5,27 @@ import Link from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { useEffect } from 'react';
 
 import MenuBar from './menuBar';
 
-const TextEditor = () => {
+interface TextEditorProps {
+  onChange: (content: string) => void;
+  initialContent?: string;
+  disabled?: boolean;
+}
+
+const TextEditor = ({
+  onChange,
+  initialContent = '',
+  disabled = false,
+}: TextEditorProps) => {
   const editor = useEditor({
+    onUpdate: ({ editor }) => {
+      // Get HTML content and pass it to the parent component through onChange
+      const html = editor.getHTML();
+      onChange(html);
+    },
     extensions: [
       Image,
       StarterKit.configure({
@@ -99,7 +115,7 @@ const TextEditor = () => {
         },
       }),
     ],
-    content: '',
+    content: initialContent,
     editorProps: {
       attributes: {
         class:
@@ -108,10 +124,19 @@ const TextEditor = () => {
     },
   });
 
+  // Effect to update editor content when initialContent changes
+  useEffect(() => {
+    // Only update if editor exists and initialContent has value
+    if (editor && initialContent && editor.getHTML() !== initialContent) {
+      // Set editor content from initialContent prop
+      editor.commands.setContent(initialContent);
+    }
+  }, [editor, initialContent]);
+
   return (
     <div className='rounded-xl border border-neutral-300'>
       <MenuBar editor={editor} />
-      <EditorContent editor={editor} />
+      <EditorContent editor={editor} disabled={disabled} />
     </div>
   );
 };

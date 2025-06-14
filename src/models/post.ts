@@ -17,3 +17,9 @@ export const postSchema = z.object({
 });
 
 export type Post = z.infer<typeof postSchema>;
+
+// Type for creating a new post with simplified author field
+// Uses TypeScript utility types to derive from the Post type
+export type CreatePost = Omit<Post, 'author'> & {
+  author: Pick<Post['author'], 'id'>
+};

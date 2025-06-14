@@ -38,8 +38,22 @@ const PostCard = ({
     return formattedDate;
   };
 
+  // change url title (%20) to (-)
+  const urlTitle = (text: string) => {
+    return text
+      .toString()
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-') // Ganti spasi dengan -
+      .replace(/[^\w-]+/g, '') // Hapus semua karakter non-kata kecuali -
+      .replace(/--+/g, '-') // Ganti beberapa - dengan satu -
+      .replace(/^-+/, '') // Hapus - dari awal teks
+      .replace(/-+$/, ''); // Hapus - dari akhir teks
+  };
+
   const handleDetailedPost = () => {
-    router.push(`/posts/${id}`);
+    const newTitle = urlTitle(title);
+    router.push(`/posts/${id}/${encodeURIComponent(newTitle)}`);
   };
 
   const handleVisitProfile = () => {

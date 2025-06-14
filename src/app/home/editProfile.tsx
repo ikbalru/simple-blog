@@ -1,19 +1,13 @@
 import { X, ThumbsUp, MessageSquare } from 'lucide-react';
 import Image from 'next/image';
 import React from 'react';
-import { MoonLoader } from 'react-spinners';
 
 import AvatarImage from '@/components/ui/avatarImage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Portal } from '@/components/ui/portal';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabsProfile';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { useGetPostComment } from '@/hooks/posts/useGetPostComment';
 import { useGetPostLike } from '@/hooks/posts/useGetPostLikes';
@@ -243,7 +237,6 @@ export const ModalEditProfile = ({
 }: ModalEditProfileProps) => {
   const user = useAppSelector(selectUser);
 
-  const [isLoading, setIsLoading] = React.useState(false);
   if (!isOpen) return null;
 
   return (
@@ -287,7 +280,7 @@ export const ModalEditProfile = ({
                 className='mx-auto shrink-0 rounded-full'
               />
 
-              <Input type='file' disabled={isLoading} className='hidden' />
+              <Input type='file' className='hidden' />
             </div>
 
             <div>
@@ -298,7 +291,6 @@ export const ModalEditProfile = ({
               <Input
                 type='text'
                 placeholder='Enter your name'
-                disabled={isLoading}
                 value={user?.name || 'Guest'}
                 className='text-sm-regular rounded-xl border border-neutral-300 px-4 py-2.5 text-neutral-950 placeholder:text-neutral-500'
               />
@@ -312,19 +304,14 @@ export const ModalEditProfile = ({
               <Input
                 type='text'
                 placeholder='Enter your headline'
-                disabled={isLoading}
                 value={user?.headline || 'No Headline'}
                 className='text-sm-regular rounded-xl border border-neutral-300 px-4 py-2.5 text-neutral-950 placeholder:text-neutral-500'
               />
             </div>
 
             {/* action */}
-            <Button type='submit' disabled={isLoading} className='h-12 w-full'>
-              {isLoading ? (
-                <MoonLoader size={16} color='#fff' />
-              ) : (
-                'Update Profile'
-              )}
+            <Button type='submit' className='h-12 w-full'>
+              Update Profile
             </Button>
           </form>
         </div>
