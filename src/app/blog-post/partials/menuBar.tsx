@@ -173,7 +173,7 @@ export default function MenuBar({ editor }: { editor: Editor | null }) {
   };
 
   return (
-    <div className='flex items-center border-b border-neutral-300 p-2.5 md:py-3'>
+    <div className='flex flex-wrap items-center border-b border-neutral-300 p-2.5 md:py-3'>
       {/* Heading */}
       <select
         value={getActiveValue()}

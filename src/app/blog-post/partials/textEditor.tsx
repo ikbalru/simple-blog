@@ -103,7 +103,7 @@ const TextEditor = () => {
     editorProps: {
       attributes: {
         class:
-          'min-h-59.5 py-3 px-4 [&_h1]:display-sm-bold [&_h2]:display-xs-bold [&_h3]:text-lg-bold [&_a]:cursor-pointer [&_a]:text-purple-500 [&_a]:hover:text-purple-300 [&_a]:underline [&_a]:underline-offset-2 ',
+          'min-h-59.5 py-3 px-4 [&_h1]:display-sm-bold [&_h2]:display-xs-bold [&_h3]:text-lg-bold [&_a]:cursor-pointer [&_a]:text-purple-500 [&_a]:hover:text-purple-300 [&_a]:underline [&_a]:underline-offset-2',
       },
     },
   });

@@ -1,98 +1,145 @@
-import { CloudUpload } from 'lucide-react';
+'use client';
+
+import {
+  CloudUpload,
+  Trash2 as RemoveIcon,
+  ArrowUpToLine as ChangeImageIcon,
+} from 'lucide-react';
 import Image from 'next/image';
-import React from 'react';
-import { useDropzone } from 'react-dropzone';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useDropzone, FileRejection, Accept } from 'react-dropzone';
 
-const ImageZone = () => {
-  const hiddenInputRef = React.useRef(null);
-  const [fileImg, setFileImg] = React.useState<File[]>([]);
+// --- Reusable ImageDropzone Component ---
+// It is a 'controlled' component, receiving its state via props.
 
-  const { getRootProps, getInputProps, open } = useDropzone({
-    accept: {
-      'image/jpg': ['.jpg', '.jpeg'],
-      'image/png': ['.png'],
+interface ImageDropzoneProps {
+  value: File | null;
+  onChange: (file: File | null) => void;
+  className?: string;
+}
+
+const MAX_SIZE_MB = 5;
+const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+const ACCEPTED_FILES: Accept = {
+  'image/jpeg': ['.jpg', '.jpeg'],
+  'image/png': ['.png'],
+};
+
+function ImageDropzone({ value, onChange, className }: ImageDropzoneProps) {
+  const [preview, setPreview] = useState<string | null>(null);
+  const [isFocused, setIsFocused] = useState(false);
+
+  const onDrop = useCallback(
+    (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+      if (fileRejections.length > 0) {
+        // In a real app, use a toast notification library like 'sonner' or 'react-hot-toast'
+        alert(`Error: ${fileRejections[0].errors[0].message}`);
+        return;
+      }
+
+      if (acceptedFiles.length > 0) {
+        onChange(acceptedFiles[0]);
+      }
     },
+    [onChange]
+  );
+
+  const { getRootProps, getInputProps, isDragActive, open, isFocused: dropzoneFocused } = useDropzone({
+    onDrop,
+    accept: ACCEPTED_FILES,
+    maxSize: MAX_SIZE_BYTES,
     maxFiles: 1,
-    maxSize: 5 * 1024 * 1024,
-    onDrop: (acceptedFiles) => {
-      setFileImg(
-        acceptedFiles.map((file) =>
-          Object.assign(file, {
-            preview: URL.createObjectURL(file),
-          })
-        )
-      );
-    },
+    // This is key: It disables the default click-to-open behavior when a file is present.
+    noClick: !!value,
+    noKeyboard: true,
   });
 
-  // Preview Image
-  const thumbs = fileImg.map((img) => (
-    <div key={img.name} className='relative mx-auto aspect-[16/9]'>
-      <Image
-        src={img.preview}
-        alt={img.name}
-        fill
-        // Revoke data uri after image is loaded
-        onLoad={() => {
-          URL.revokeObjectURL(img.preview);
-        }}
-      />
-    </div>
-  ));
+  useEffect(() => {
+    if (!value) {
+      setPreview(null);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(value);
+    setPreview(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [value]);
 
-  React.useEffect(() => {
-    // Make sure to revoke the data uris to avoid memory leaks, will run on unmount
-    return () => fileImg.forEach((img) => URL.revokeObjectURL(img.preview));
-  }, [fileImg]);
+  const handleRemove = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevents the file dialog from opening on click
+    onChange(null);
+  };
+
+  const handleChange = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    open(); // Manually open the file dialog for the "Change" button
+  };
+
+  // Update focus state when dropzone focus state changes
+  useEffect(() => {
+    setIsFocused(dropzoneFocused);
+  }, [dropzoneFocused]);
 
   return (
-    <div className='rounded-xl border border-dashed border-neutral-400 bg-neutral-50 px-6 py-4'>
-      {fileImg.length > 0 ? (
-        <div>
-          {thumbs}
-          <div className='flex-center gap-2 pt-3'>
-            <button className='text-sm-regular rounded-md border border-neutral-300 px-3 py-1.5 text-neutral-900'>
+    <div
+      {...getRootProps()}
+      className={`rounded-xl border-2 border-dashed ${isDragActive || isFocused ? 'border-primary-300' : 'border-neutral-300'} ${!value ? 'cursor-pointer' : ''} ${className} transition-colors`}
+    >
+      <input {...getInputProps()} />
+      {preview && value ? (
+        // --- PREVIEW STATE (Gambar sudah ada) ---
+        <div className='relative p-2'>
+          <div className='relative mx-auto aspect-video overflow-hidden rounded-md'>
+            <Image
+              src={preview}
+              alt={value.name}
+              fill
+              sizes='100%'
+              className='object-contain'
+            />
+          </div>
+          <div className='flex-center flex-wrap gap-3 py-3'>
+            <button
+              type='button'
+              onClick={handleChange}
+              className='text-sm-regular flex cursor-pointer items-center gap-1.5 rounded-md border border-neutral-300 px-3 py-1.5 text-neutral-900 hover:bg-neutral-100'
+            >
+              <ChangeImageIcon className='size-5' />
               Change
             </button>
-            <button className='text-sm-regular rounded-md border border-neutral-300 px-3 py-1.5 text-neutral-900'>
+            <button
+              type='button'
+              onClick={handleRemove}
+              className='text-sm-regular flex cursor-pointer items-center gap-1.5 rounded-md border border-neutral-300 px-3 py-1.5 text-[#EE1D52] hover:bg-neutral-100'
+            >
+              <RemoveIcon className='size-5' />
               Remove
             </button>
           </div>
-          <p className='text-xs-regular mx-auto w-fit pt-3 text-neutral-700'>
-            PNG or JPG (max. 5mb)
+          <p className='text-xs-regular mt-1 text-center text-neutral-500'>
+            PNG or JPG (max. {MAX_SIZE_MB}mb)
           </p>
         </div>
       ) : (
-        <div {...getRootProps({ className: 'dropzone' })}>
-          <div className='bg-base-white mx-auto w-fit rounded-md border border-neutral-300 p-2.5'>
+        // --- PLACEHOLDER STATE (Belum ada gambar) ---
+        // We removed the manual onClick={open} from this div.
+        // The click is now handled by getRootProps on the parent div, which respects the `noClick` option.
+        <div className='flex flex-col items-center justify-center p-8 text-center'>
+          <div className='rounded-md border border-neutral-300 bg-white p-2.5'>
             <CloudUpload className='size-5 text-neutral-950' />
           </div>
-          <input
-            type='file'
-            name='image'
-            style={{ opacity: 0 }}
-            ref={hiddenInputRef}
-          />
-          <input {...getInputProps()} />
-          <div className='flex-center flex gap-1 pt-3'>
-            <button
-              className='text-sm-semibold text-primary-300 cursor-pointer'
-              onClick={open}
-            >
+          <div className='mt-4 flex flex-wrap justify-center gap-1'>
+            <span className='text-primary-300 text-sm font-semibold'>
               Click to upload
-            </button>
-            <span className='text-sm-regular text-neutral-700'>
-              or drag and drop
             </span>
+            <span className='text-sm text-neutral-600'>or drag and drop</span>
           </div>
-
-          <p className='text-xs-regular mx-auto w-fit pt-1 text-neutral-700'>
-            PNG or JPG (max. 5mb)
+          <p className='text-xs-regular mt-1 text-neutral-500'>
+            PNG or JPG (max. {MAX_SIZE_MB}mb)
           </p>
         </div>
       )}
     </div>
   );
-};
+}
 
-export default ImageZone;
+export default ImageDropzone;
