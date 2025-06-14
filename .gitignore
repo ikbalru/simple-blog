@@ -48,5 +48,5 @@ RegisterForm.tsx
 toggle.tsx
 
 # exclude specific app directories
-/src/app/blog-post/
+# /src/app/blog-post/
 /src/app/home/

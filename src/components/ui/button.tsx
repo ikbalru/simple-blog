@@ -20,6 +20,7 @@ const buttonVariants = cva(
         noOutline:
           'bg-base-white hover:bg-primary-100 !text-neutral-900 rounded-full text-xs-regular md:text-sm-regular',
         link: '!text-primary-300 underline-offset-4 underline hover:!text-primary-200 text-xs-regular md:text-sm-regular',
+        menu: 'inline-flex items-center justify-center gap-2 rounded-md text-sm hover:bg-muted hover:text-muted-foreground bg-transparent cursor-pointer !text-neutral-950',
       },
       size: {
         default: 'h-11 w-45.5',
@@ -28,6 +29,7 @@ const buttonVariants = cva(
         link: 'w-fit',
         icon: 'h-6 w-6',
         page: 'h-12 min-w-12',
+        menu: 'h-9 px-2 min-w-9',
       },
     },
     defaultVariants: {
