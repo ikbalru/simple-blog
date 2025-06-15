@@ -10,6 +10,7 @@ import SafeImage from '@/components/ui/safeImage';
 
 import { useIntersectionObserver } from '@/hooks/general/useIntersectionObserver';
 import { useGetMyPostsInfinite } from '@/hooks/posts/useGetMyPost';
+import { urlTitle } from '@/lib/utility';
 import { Post } from '@/models/post';
 
 import { ModalDelete, ModalStatistics } from './postsModal';
@@ -151,7 +152,8 @@ export const PostCardUser = ({
   };
 
   const handleDetailedPost = () => {
-    router.push(`/posts/${id}`);
+    const newTitle = urlTitle(title);
+    router.push(`/posts/${id}/${encodeURIComponent(newTitle)}`);
   };
 
   const handleClickEditPost = (id: number) => {

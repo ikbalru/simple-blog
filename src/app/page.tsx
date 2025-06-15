@@ -20,6 +20,7 @@ import PostCard from '@/components/ui/postCard';
 
 import { useGetPostsMostLiked } from '@/hooks/posts/useGetPostsMostLiked';
 import { useGetPostsRecommended } from '@/hooks/posts/useGetPostsRecommended';
+import { urlTitle } from '@/lib/utility';
 import { Post } from '@/models/post';
 
 const Home = () => {
@@ -140,7 +141,8 @@ const Aside: React.FC<Post> = ({ title, content, likes, comments, id }) => {
   const router = useRouter();
 
   const handleDetailedPost = () => {
-    router.push(`/posts/${id}`);
+    const newTitle = urlTitle(title);
+    router.push(`/posts/${id}/${encodeURIComponent(newTitle)}`);
   };
 
   return (

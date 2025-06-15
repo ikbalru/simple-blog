@@ -8,6 +8,7 @@ import { MoonLoader } from 'react-spinners';
 import { z } from 'zod';
 
 import Footer from '@/components/layout/footer';
+import Navbar from '@/components/layout/navbar';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -21,6 +22,7 @@ import { Input } from '@/components/ui/input';
 import { useCreatePost } from '@/hooks/posts/useCreatePost';
 import { useGetMyPostsInfinite } from '@/hooks/posts/useGetMyPost';
 import { useGetPostById } from '@/hooks/posts/useGetPostById';
+import { useUpdatePost } from '@/hooks/posts/useUpdatePost';
 
 import ImageZone from './imageZone';
 import InputTags from './inputTags';
@@ -54,6 +56,7 @@ const BlogPost = ({ id }: { id?: number }) => {
 
   const { createPost, isCreating } = useCreatePost();
   const { queryKeyMyPostInfinite } = useGetMyPostsInfinite();
+  const { updatePost } = useUpdatePost();
 
   // Only fetch post data when in edit mode and id is available
   const { post, isFetching } = useGetPostById(
@@ -92,14 +95,11 @@ const BlogPost = ({ id }: { id?: number }) => {
   // Handle form submission
   async function onSubmit(data: z.infer<typeof formSchema>) {
     try {
-      // Log the data before submission
-
       if (editMode) {
-        console.log('FORM DATA IN EDIT MODE:', {
-          title: data.title,
-          content: data.content,
-          tags: data.tags,
-          image: data.image.name,
+        updatePost({
+          payload: data,
+          queryKey: queryKeyMyPostInfinite,
+          id: id,
         });
       } else {
         createPost({
@@ -116,7 +116,8 @@ const BlogPost = ({ id }: { id?: number }) => {
   }
   return (
     <>
-      <main className='profile-container'>
+      <Navbar blogPost={editMode ? 'editMode' : 'writeMode'} />
+      <main className='profile-container pt-4 md:pt-12'>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}

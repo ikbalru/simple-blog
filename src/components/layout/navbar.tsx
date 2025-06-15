@@ -1,6 +1,6 @@
 'use client';
 
-import { Menu, PenLine, Search } from 'lucide-react';
+import { ArrowLeft, Menu, PenLine, Search } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -28,7 +28,7 @@ import {
   SheetTrigger,
 } from '../ui/sheet';
 
-const Navbar = () => {
+const Navbar = ({ blogPost }: { blogPost?: 'writeMode' | 'editMode' }) => {
   const user = useSelector(selectUser);
   const router = useRouter();
 
@@ -39,118 +39,156 @@ const Navbar = () => {
   return (
     <header className='bg-base-white fixed top-0 z-50 h-16 w-full border-b border-neutral-300 md:h-20'>
       <div className='custom-container flex-between flex h-full gap-4'>
-        <Link href='/' aria-label='home'>
-          <Image
-            src='/images/logo.svg'
-            alt='company-log'
-            width={105}
-            height={24}
-            className='shrink-0 cursor-pointer lg:h-9 lg:w-39.5'
-          />
-        </Link>
+        {!blogPost && (
+          <>
+            <Link href='/' aria-label='home'>
+              <Image
+                src='/images/logo.svg'
+                alt='company-log'
+                width={105}
+                height={24}
+                className='shrink-0 cursor-pointer lg:h-9 lg:w-39.5'
+              />
+            </Link>
 
-        {/* search bar */}
-        <SearchBar />
+            {/* search bar */}
+            <SearchBar />
 
-        {/* action buttons */}
-        <nav className='hidden items-center space-x-6 lg:flex'>
-          {!user ? (
-            <Button asChild variant='link' size='link'>
-              <Link href='/login'>Login</Link>
-            </Button>
-          ) : (
-            <Button
-              size='link'
-              variant='link'
-              onClick={handleClickWritePost}
-              className='flex items-center gap-2'
+            {/* action buttons */}
+            <nav className='hidden items-center space-x-6 lg:flex'>
+              {!user ? (
+                <Button asChild variant='link' size='link'>
+                  <Link href='/login'>Login</Link>
+                </Button>
+              ) : (
+                <Button
+                  size='link'
+                  variant='link'
+                  onClick={handleClickWritePost}
+                  className='flex items-center gap-2'
+                >
+                  <PenLine className='size-6' />
+                  <span className='text-sm-semibold underline underline-offset-3'>
+                    Write Post
+                  </span>
+                </Button>
+              )}
+
+              {/* Divider */}
+              <div className='h-5.75 w-px bg-neutral-300'></div>
+
+              {!user ? (
+                <Button asChild>
+                  <Link href='/register'>Register</Link>
+                </Button>
+              ) : (
+                <DropDownMenu>
+                  <button
+                    aria-label='profile'
+                    className='flex h-20 cursor-pointer items-center gap-3 outline-none'
+                  >
+                    <AvatarImage
+                      src={user.avatarUrl || '/images/profile-dummy.jpg'}
+                      alt='profile'
+                      width={40}
+                      height={40}
+                      className='shrink-0 cursor-pointer rounded-full object-cover'
+                    />
+                    <p className='text-sm-medium text-neutral-900'>
+                      {user.name}
+                    </p>
+                  </button>
+                </DropDownMenu>
+              )}
+            </nav>
+
+            {/* mobile */}
+            <div className='flex items-center gap-6 text-neutral-950 lg:hidden'>
+              {!user ? (
+                <>
+                  {/* mobile menu non login */}
+                  <Search className='size-6 cursor-pointer' />
+
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <button className='cursor-pointer' aria-label='menu'>
+                        <Menu className='size-6 cursor-pointer' />
+                      </button>
+                    </SheetTrigger>
+                    <SheetContent>
+                      <SheetHeader>
+                        <SheetTitle>
+                          <Image
+                            src='/images/logo.svg'
+                            alt='company-log'
+                            width={105}
+                            height={24}
+                          />
+                        </SheetTitle>
+                      </SheetHeader>
+
+                      {/* action buttons */}
+                      <div className='flex flex-col items-center gap-y-4'>
+                        <Button asChild variant='link' size='link'>
+                          <Link href='/login'>Login</Link>
+                        </Button>
+
+                        <Button asChild className='w-53.5'>
+                          <Link href='/register'>Register</Link>
+                        </Button>
+                      </div>
+                    </SheetContent>
+                  </Sheet>
+                </>
+              ) : (
+                // mobile menu login
+                <DropDownMenu>
+                  <button className='cursor-pointer' aria-label='profile'>
+                    <Image
+                      src={user.avatarUrl || '/images/profile-dummy.jpg'}
+                      alt='profile'
+                      width={40}
+                      height={40}
+                      className='cursor-pointer rounded-full'
+                    />
+                  </button>
+                </DropDownMenu>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* render only when create post */}
+        {blogPost && (
+          <>
+            <button
+              onClick={() => router.back()}
+              className='flex cursor-pointer items-center gap-2 md:gap-4.5'
             >
-              <PenLine className='size-6' />
-              <span className='text-sm-semibold underline underline-offset-3'>
-                Write Post
-              </span>
-            </Button>
-          )}
-
-          {/* Divider */}
-          <div className='h-5.75 w-px bg-neutral-300'></div>
-
-          {!user ? (
-            <Button asChild>
-              <Link href='/register'>Register</Link>
-            </Button>
-          ) : (
+              <ArrowLeft size={24} />
+              <p className='text-md-bold md:display-xs-bold text-neutral-900'>
+                {blogPost === 'writeMode' ? 'Write Post' : 'Edit Post'}
+              </p>
+            </button>
             <DropDownMenu>
               <button
                 aria-label='profile'
                 className='flex h-20 cursor-pointer items-center gap-3 outline-none'
               >
                 <AvatarImage
-                  src={user.avatarUrl || '/images/profile-dummy.jpg'}
+                  src={user?.avatarUrl || '/images/profile-dummy.jpg'}
                   alt='profile'
                   width={40}
                   height={40}
                   className='shrink-0 cursor-pointer rounded-full object-cover'
                 />
-                <p className='text-sm-medium text-neutral-900'>{user.name}</p>
+                <p className='text-sm-medium hidden text-neutral-900 md:block'>
+                  {user?.name}
+                </p>
               </button>
             </DropDownMenu>
-          )}
-        </nav>
-
-        {/* mobile */}
-        <div className='flex items-center gap-6 text-neutral-950 lg:hidden'>
-          {/* mobile menu non login */}
-          {!user ? (
-            <>
-              <Search className='size-6 cursor-pointer' />
-
-              <Sheet>
-                <SheetTrigger asChild>
-                  <button className='cursor-pointer' aria-label='menu'>
-                    <Menu className='size-6 cursor-pointer' />
-                  </button>
-                </SheetTrigger>
-                <SheetContent>
-                  <SheetHeader>
-                    <SheetTitle>
-                      <Image
-                        src='/images/logo.svg'
-                        alt='company-log'
-                        width={105}
-                        height={24}
-                      />
-                    </SheetTitle>
-                  </SheetHeader>
-
-                  {/* action buttons */}
-                  <div className='flex flex-col items-center gap-y-4'>
-                    <Button asChild variant='link' size='link'>
-                      <Link href='/login'>Login</Link>
-                    </Button>
-
-                    <Button asChild className='w-53.5'>
-                      <Link href='/register'>Register</Link>
-                    </Button>
-                  </div>
-                </SheetContent>
-              </Sheet>
-            </>
-          ) : (
-            // mobile menu login
-            <DropDownMenu>
-              <button className='cursor-pointer' aria-label='profile'>
-                <Image
-                  src={user.avatarUrl || '/images/profile-dummy.jpg'}
-                  alt='profile'
-                  width={40}
-                  height={40}
-                  className='cursor-pointer rounded-full'
-                />
-              </button>
-            </DropDownMenu>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </header>
   );

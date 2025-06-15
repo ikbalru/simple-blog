@@ -13,6 +13,7 @@ import {
   CreateCommentVariables,
   useCreateComment,
 } from '@/hooks/posts/useCreateComment';
+import { formatDate } from '@/lib/utility';
 import { Comment } from '@/models/comment';
 import { Post } from '@/models/post';
 import { User } from '@/models/user';
@@ -24,17 +25,10 @@ type CommentsProps = {
   post: Post;
   user: User | null;
   comments: Comment[];
-  formatDate: (createdAt: string | Date | undefined) => string;
   queryKeyComment: CommentsQueryKey;
 };
 
-const Comments = ({
-  post,
-  user,
-  comments,
-  formatDate,
-  queryKeyComment,
-}: CommentsProps) => {
+const Comments = ({ post, user, comments, queryKeyComment }: CommentsProps) => {
   const router = useRouter();
 
   const currentUser = useAppSelector(selectUser);
@@ -50,7 +44,6 @@ const Comments = ({
 
   const handleOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('query di kompoenen', queryKeyComment);
 
     if (!token) {
       alert('You must login first');
@@ -176,7 +169,6 @@ const Comments = ({
       {open && (
         <ModalComment
           comments={comments}
-          formatDate={formatDate}
           isOpen={open}
           onClose={handleModalComment}
         />
@@ -189,14 +181,12 @@ export default Comments;
 
 type ModalCommentProps = {
   comments: Comment[];
-  formatDate: (createdAt: string | Date | undefined) => string;
   isOpen: boolean;
   onClose: () => void;
 };
 
 export const ModalComment = ({
   comments,
-  formatDate,
   isOpen,
   onClose,
 }: ModalCommentProps) => {

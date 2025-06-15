@@ -18,6 +18,7 @@ import { useGetPostLike } from '@/hooks/posts/useGetPostLikes';
 import { useGetPostsRecommended } from '@/hooks/posts/useGetPostsRecommended';
 import { useUpdatePostLike } from '@/hooks/posts/usePostLikePostById';
 import { useGetUserProfile } from '@/hooks/users/useGetUserProfile';
+import { formatDate } from '@/lib/utility';
 import { selectToken, selectUser } from '@/store/redux/auth/auth.selector';
 import { useAppSelector } from '@/store/redux/store';
 
@@ -66,18 +67,6 @@ const PostbyId = () => {
   const anotherPost = postsRecommended.filter(
     (post) => post.id !== Number(params.postId)
   );
-
-  // format date function
-  const formatDate = (createdAt: string | Date | undefined) => {
-    if (!createdAt) return '';
-    const date = new Date(createdAt);
-    const formattedDate = date.toLocaleDateString('en-GB', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-    return formattedDate;
-  };
 
   const handleLikePost = () => {
     if (!token) {
@@ -219,7 +208,6 @@ const PostbyId = () => {
                 post={post}
                 comments={comments}
                 user={user}
-                formatDate={formatDate}
                 queryKeyComment={queryKeyComments}
               />
 
