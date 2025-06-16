@@ -4,7 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
 
 import Footer from '@/components/layout/footer';
 import Navbar from '@/components/layout/navbar';
@@ -197,9 +196,10 @@ const PostbyId = () => {
                   sizes='100%'
                 />
               </div>
-              <article className='prose prose-neutral prose-base max-w-none'>
-                <ReactMarkdown>{post.content}</ReactMarkdown>
-              </article>
+              <article
+                className='prose prose-neutral prose-base max-w-none overflow-hidden'
+                dangerouslySetInnerHTML={{ __html: post.content }}
+              ></article>
             </section>
 
             {/* comments section */}

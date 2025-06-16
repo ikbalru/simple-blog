@@ -73,9 +73,10 @@ const PostCard = ({
           ))}
         </ul>
 
-        <p className='text-xs-regular md:text-sm-regular mt-2 line-clamp-2 text-neutral-900 md:mt-3'>
-          {content}
-        </p>
+        <p
+          className='text-xs-regular md:text-sm-regular mt-2 line-clamp-2 text-neutral-900 md:mt-3'
+          dangerouslySetInnerHTML={{ __html: content }}
+        ></p>
 
         {/* post account */}
         <div className='mt-3 flex items-center gap-3 md:mt-4'>
