@@ -1,6 +1,7 @@
 'use client';
+
 import { useSearchParams } from 'next/navigation';
-import React from 'react';
+import { Suspense } from 'react';
 
 import Footer from '@/components/layout/footer';
 import Navbar from '@/components/layout/navbar';
@@ -13,6 +14,16 @@ import { useGetPostsRecommendedInfinite } from '@/hooks/posts/useGetPostsRecomme
 import { useGetUserProfile } from '@/hooks/users/useGetUserProfile';
 
 const Page = () => {
+  return (
+    <Suspense fallback={<div>Loading profile...</div>}>
+      <ProfileContent />
+    </Suspense>
+  );
+};
+
+export default Page;
+
+const ProfileContent = () => {
   const searchParams = useSearchParams();
   const email = searchParams.get('email');
 
@@ -102,7 +113,7 @@ const Page = () => {
         )}
 
         {/* not found */}
-        {postsInfinite.length === 0 && (
+        {postsInfinite.length === 0 && !isLoading && !error && (
           <NotFound
             title='No posts from this user yet'
             subtitle='Stay tuned for future posts'
@@ -110,10 +121,7 @@ const Page = () => {
         )}
       </main>
 
-      {/* footer */}
       <Footer />
     </>
   );
 };
-
-export default Page;

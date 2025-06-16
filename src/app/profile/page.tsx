@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import React from 'react';
 
 import Footer from '@/components/layout/footer';
@@ -11,8 +12,12 @@ import { selectUser } from '@/store/redux/auth/auth.selector';
 import { useAppSelector } from '@/store/redux/store';
 
 import ChangePassword from './partials/changePassword';
-import { ModalEditProfile } from './partials/profileModal';
 import YourPosts from './partials/yourPosts';
+
+const ModalEditProfile = dynamic(
+  () => import('./partials/profileModal').then((mod) => mod.ModalEditProfile),
+  { ssr: false }
+);
 
 const Page = () => {
   const user = useAppSelector(selectUser);

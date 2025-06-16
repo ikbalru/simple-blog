@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import React from 'react';
+import React, { Suspense } from 'react';
 
 import Footer from '@/components/layout/footer';
 import Navbar from '@/components/layout/navbar';
@@ -12,10 +12,9 @@ import SearchBar from '@/components/ui/searchBar';
 import { useIntersectionObserver } from '@/hooks/general/useIntersectionObserver';
 import { useSearchPosts } from '@/hooks/posts/useSearchPosts';
 
-const Search = () => {
+const SearchContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-
   const querySearch = searchParams.get('query') || '';
 
   const {
@@ -117,6 +116,14 @@ const Search = () => {
       </main>
       <Footer />
     </>
+  );
+};
+
+const Search = () => {
+  return (
+    <Suspense fallback={<div>Loading search results...</div>}>
+      <SearchContent />
+    </Suspense>
   );
 };
 
