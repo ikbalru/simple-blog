@@ -3,11 +3,7 @@
 import BlogPost from '@/app/blog-post/partials/blogPost';
 
 const WritePost = () => {
-  return (
-    <>
-      <BlogPost />
-    </>
-  );
+  return <BlogPost />;
 };
 
 export default WritePost;

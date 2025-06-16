@@ -205,6 +205,11 @@ const DropDownMenu: React.FC<{ children: React.ReactNode }> = ({
   const handleProfile = () => {
     router.push('/profile');
   };
+
+  const handleSearch = () => {
+    router.push('/search');
+  };
+
   const handleLogout = () => {
     dispatch(logout());
     router.replace('/');
@@ -227,6 +232,15 @@ const DropDownMenu: React.FC<{ children: React.ReactNode }> = ({
               className='md:size-5'
             />
             Profile
+          </button>
+        </DropdownMenuItem>
+        <DropdownMenuItem className='block lg:hidden'>
+          <button
+            onClick={handleSearch}
+            className='flex cursor-pointer items-center gap-2'
+          >
+            <Search className='size-4 cursor-pointer text-neutral-900' />
+            Search
           </button>
         </DropdownMenuItem>
         <DropdownMenuItem>
