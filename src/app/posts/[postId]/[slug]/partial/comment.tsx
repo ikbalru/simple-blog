@@ -36,7 +36,7 @@ const Comments = ({ post, user, comments, queryKeyComment }: CommentsProps) => {
   const { createComment } = useCreateComment();
 
   const [open, setOpen] = React.useState(false);
-  const [comment, setComment] = React.useState('');
+  const commentRef = React.useRef<HTMLTextAreaElement>(null);
 
   const handleModalComment = () => {
     setOpen((prev) => !prev);
@@ -45,11 +45,16 @@ const Comments = ({ post, user, comments, queryKeyComment }: CommentsProps) => {
   const handleOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const comment = commentRef.current?.value.trim();
+
+    if (!comment) return;
+
     if (!token) {
       alert('You must login first');
       return router.push('/login');
     }
 
+    // create variable for useCreateComment hook for fetching data
     const variables: CreateCommentVariables = {
       postId: post.id,
       payload: {
@@ -59,10 +64,11 @@ const Comments = ({ post, user, comments, queryKeyComment }: CommentsProps) => {
       currentUser: currentUser!,
     };
 
-    if (comment.trim()) {
-      createComment(variables);
-    }
-    setComment('');
+    // running hook create comment
+    createComment(variables);
+
+    // reset comment
+    commentRef.current!.value = '';
   };
 
   return (
@@ -97,11 +103,7 @@ const Comments = ({ post, user, comments, queryKeyComment }: CommentsProps) => {
             Give your Comments
           </label>
 
-          <Textarea
-            placeholder='Enter your comment'
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-          />
+          <Textarea placeholder='Enter your comment' ref={commentRef} />
 
           <Button type='submit' className='h-12 w-full self-end md:w-51'>
             Send
@@ -218,11 +220,14 @@ export const ModalComment = ({
             {/* form comment */}
             <form className='flex flex-col gap-3 pt-4 md:pt-5'>
               {/* comment text */}
-              <label className='text-sm-semibold text-neutral-950'>
+              <label
+                htmlFor='comment'
+                className='text-sm-semibold text-neutral-950'
+              >
                 Give your Comments
               </label>
 
-              <Textarea placeholder='Enter your comment' />
+              <Textarea placeholder='Enter your comment' id='comment' />
 
               <Button className='h-10 w-full self-end md:h-12 md:w-51'>
                 Send

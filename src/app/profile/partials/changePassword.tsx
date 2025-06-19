@@ -38,9 +38,14 @@ const changePasswordFormSchema = z
       required_error: 'Confirm New Password is required',
     }),
   })
-  .refine((data) => data.newPassword == data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
+  .superRefine((data, ctx) => {
+    if (data.newPassword !== data.confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['confirmPassword'],
+        message: 'Passwords do not match',
+      });
+    }
   });
 
 const ChangePassword = () => {

@@ -144,12 +144,12 @@ const Navbar = ({ blogPost }: { blogPost?: 'writeMode' | 'editMode' }) => {
                 // mobile menu login
                 <DropDownMenu>
                   <button className='cursor-pointer' aria-label='profile'>
-                    <Image
+                    <AvatarImage
                       src={user.avatarUrl || '/images/profile-dummy.jpg'}
                       alt='profile'
                       width={40}
                       height={40}
-                      className='cursor-pointer rounded-full'
+                      className='cursor-pointer rounded-full object-cover'
                     />
                   </button>
                 </DropDownMenu>
@@ -224,7 +224,7 @@ const DropDownMenu: React.FC<{ children: React.ReactNode }> = ({
             onClick={handleProfile}
             className='flex cursor-pointer items-center gap-2'
           >
-            <Image
+            <AvatarImage
               src='/icons/user-icon.svg'
               alt='user-icon'
               width={16}

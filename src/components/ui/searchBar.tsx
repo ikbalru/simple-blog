@@ -9,15 +9,11 @@ import { Input } from './input';
 const SearchBar = ({ className }: { className?: string }) => {
   const router = useRouter();
 
-  const [searchQuery, setSearchQuery] = React.useState('');
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
+  const searchRef = React.useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const query = searchQuery.trim();
+    const query = searchRef.current?.value.trim();
 
     if (!query) return;
 
@@ -37,12 +33,7 @@ const SearchBar = ({ className }: { className?: string }) => {
         <button type='submit' aria-label='Search'>
           <Search className='size-6 cursor-pointer text-neutral-500' />
         </button>
-        <Input
-          type='search'
-          placeholder='Search'
-          value={searchQuery}
-          onChange={handleChange}
-        />
+        <Input type='search' placeholder='Search' ref={searchRef} />
       </div>
     </form>
   );
