@@ -1,6 +1,6 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { Suspense } from 'react';
 
 import Footer from '@/components/layout/footer';
@@ -10,8 +10,7 @@ import NotFound from '@/components/ui/notFound';
 import PostCard from '@/components/ui/postCard';
 
 import { useIntersectionObserver } from '@/hooks/general/useIntersectionObserver';
-import { useGetPostsRecommendedInfinite } from '@/hooks/posts/useGetPostsRecommended';
-import { useGetUserProfile } from '@/hooks/users/useGetUserProfile';
+import { useGetPostVisitProfile } from '@/hooks/posts/useGetPostVisitProfile';
 
 const Page = () => {
   return (
@@ -24,18 +23,20 @@ const Page = () => {
 export default Page;
 
 const ProfileContent = () => {
-  const searchParams = useSearchParams();
-  const email = searchParams.get('email');
+  const params = useParams();
+  const userId = params.visitProfileId;
 
   const {
-    postsInfinite,
+    postsVisitProfile,
+    userVisitProfile,
     isFetchingNextPage,
     error,
     fetchNextPage,
     hasNextPage,
     isLoading,
     total,
-  } = useGetPostsRecommendedInfinite({
+  } = useGetPostVisitProfile({
+    userId: Number(userId),
     limit: 5,
   });
 
@@ -48,10 +49,6 @@ const ProfileContent = () => {
     isFetchingNextPage,
   });
 
-  const { user } = useGetUserProfile({
-    email: email || '',
-  });
-
   return (
     <>
       <Navbar />
@@ -61,8 +58,8 @@ const ProfileContent = () => {
         <section className='flex items-center gap-2 pb-4 md:gap-3 md:pb-6'>
           {/* image profile */}
           <AvatarImage
-            src={user?.avatarUrl || '/images/profile-dummy.jpg'}
-            alt='profile'
+            src={userVisitProfile?.avatarUrl || '/images/profile-dummy.jpg'}
+            alt={userVisitProfile?.name || 'profile'}
             width={40}
             height={40}
             className='aspect-ratio cursor-pointer overflow-hidden rounded-full md:h-20 md:w-20'
@@ -71,11 +68,11 @@ const ProfileContent = () => {
           <div>
             {/* name profile */}
             <p className='text-sm-bold md:text-lg-bold text-neutral-900'>
-              {user?.name}
+              {userVisitProfile?.name}
             </p>
             {/* accupation */}
             <p className='text-xs-regular md:text-md-regular text-neutral-900'>
-              {user?.headline || 'No Headline'}
+              {userVisitProfile?.headline || 'No Headline'}
             </p>
           </div>
         </section>
@@ -86,11 +83,13 @@ const ProfileContent = () => {
             {total} Post
           </h1>
           <ul className='divide-y divide-neutral-300' ref={containerRef}>
-            {postsInfinite.map((post, index) => (
+            {postsVisitProfile.map((post, index) => (
               <li
                 key={post.id}
                 className='py-4 first-of-type:pt-0 last-of-type:pb-0 md:py-6'
-                ref={index === postsInfinite.length - 1 ? lastElementRef : null}
+                ref={
+                  index === postsVisitProfile.length - 1 ? lastElementRef : null
+                }
               >
                 <PostCard {...post} />
               </li>
@@ -113,7 +112,7 @@ const ProfileContent = () => {
         )}
 
         {/* not found */}
-        {postsInfinite.length === 0 && !isLoading && !error && (
+        {total === 0 && !isLoading && !error && (
           <NotFound
             title='No posts from this user yet'
             subtitle='Stay tuned for future posts'

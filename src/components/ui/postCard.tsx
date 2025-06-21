@@ -34,7 +34,7 @@ const PostCard = ({
   };
 
   const handleVisitProfile = () => {
-    router.push(`/visit-profile?email=${encodeURIComponent(author.email)}`);
+    router.push(`/visit-profile/${author.id}`);
   };
 
   return (

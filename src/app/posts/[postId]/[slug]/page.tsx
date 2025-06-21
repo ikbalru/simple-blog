@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import React from 'react';
 
 import Footer from '@/components/layout/footer';
@@ -26,6 +26,7 @@ import Comments from './partial/comment';
 const random = Math.floor(Math.random() * 10) + 1;
 
 const PostbyId = () => {
+  const router = useRouter();
   const params = useParams();
 
   const {
@@ -66,6 +67,12 @@ const PostbyId = () => {
   const anotherPost = postsRecommended.filter(
     (post) => post.id !== Number(params.postId)
   );
+
+  console.log('anotherPost: ', [anotherPost[0]]);
+
+  const handleVisitProfile = () => {
+    router.push(`/visit-profile/${post!.author.id}`);
+  };
 
   const handleLikePost = () => {
     if (!token) {
@@ -115,10 +122,14 @@ const PostbyId = () => {
                     width={40}
                     height={40}
                     className='cursor-pointer rounded-full'
+                    onClick={handleVisitProfile}
                   />
 
                   {/* name profile */}
-                  <p className='text-xs-regular md:text-sm-medium text-neutral-900'>
+                  <p
+                    className='text-xs-regular md:text-sm-medium cursor-pointer text-neutral-900 hover:underline hover:underline-offset-3'
+                    onClick={handleVisitProfile}
+                  >
                     {post.author.name}
                   </p>
 
@@ -197,7 +208,7 @@ const PostbyId = () => {
                 />
               </div>
               <article
-                className='prose prose-neutral prose-base max-w-none overflow-hidden'
+                className='prose prose-neutral prose-base max-w-none overflow-hidden px-3'
                 dangerouslySetInnerHTML={{ __html: post.content }}
               ></article>
             </section>
@@ -228,22 +239,31 @@ const PostbyId = () => {
             {/* related posts */}
             <section className='pt-3 md:pt-4'>
               <h2 className='text-xl-bold md:display-xs-bold pb-3 md:pb-4'>
-                Another Posts
+                Another Post
               </h2>
               {/* postcard */}
-              {anotherPost.map((post) => (
-                <PostCard key={post.id} {...post} />
-              ))}
+              {anotherPost.length > 0 ? (
+                <>
+                  {[anotherPost[0]].map((post) => (
+                    <PostCard key={post.id} {...post} />
+                  ))}
+                </>
+              ) : (
+                <p className='text-md-regular mt-10 text-neutral-900'>
+                  No another post found
+                </p>
+              )}
 
               {/* Loading */}
               {isFetchingRecommended && (
-                <p className='text-md-regular mt-10 h-[100vh] text-neutral-900'>
+                <p className='text-md-regular mt-10 h-[20vh] text-neutral-900'>
                   Please wait while data being load...
                 </p>
               )}
+
               {/* Error */}
               {errorRecommended && (
-                <p className='text-md-regular mt-10 h-[100vh] text-neutral-900'>
+                <p className='text-md-regular mt-10 h-[20vh] text-neutral-900'>
                   Error loading posts: {errorRecommended.message}
                 </p>
               )}
